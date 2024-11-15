@@ -1,0 +1,11 @@
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\bin\Debug\Sistema de Ventas.exe
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\bin\Debug\Sistema de Ventas.pdb
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\obj\Debug\Sistema de Ventas.csprojResolveAssemblyReference.cache
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\obj\Debug\Sistema_de_Ventas.Form1.resources
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\obj\Debug\Sistema_de_Ventas.Properties.Resources.resources
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\obj\Debug\Sistema de Ventas.csproj.GenerateResource.Cache
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\obj\Debug\Sistema de Ventas.exe
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\obj\Debug\Sistema de Ventas.pdb
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\obj\Debug\Sistema_de_Ventas.Gerente.resources
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\obj\Debug\Sistema_de_Ventas.Administrador.resources
+C:\Users\flore\OneDrive\Documentos\Visual Studio 2015\Projects\Sistema de Ventas\Sistema de Ventas\obj\Debug\Sistema_de_Ventas.Cajero.resources
