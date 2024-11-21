@@ -44,14 +44,107 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Administrador.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Administrador.Designer.cs">
+      <DependentUpon>Administrador.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Cajero.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Cajero.Designer.cs">
+      <DependentUpon>Cajero.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormClientes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormClientes.Designer.cs">
+      <DependentUpon>FormClientes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormCompras.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCompras.Designer.cs">
+      <DependentUpon>FormCompras.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormConfiguracion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormConfiguracion.Designer.cs">
+      <DependentUpon>FormConfiguracion.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormDetalles.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormDetalles.Designer.cs">
+      <DependentUpon>FormDetalles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormPrincipal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormPrincipal.Designer.cs">
+      <DependentUpon>FormPrincipal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormProveedores.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormProveedores.Designer.cs">
+      <DependentUpon>FormProveedores.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormVentas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormVentas.Designer.cs">
+      <DependentUpon>FormVentas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Gerente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Gerente.Designer.cs">
+      <DependentUpon>Gerente.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Administrador.resx">
+      <DependentUpon>Administrador.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Cajero.resx">
+      <DependentUpon>Cajero.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormClientes.resx">
+      <DependentUpon>FormClientes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCompras.resx">
+      <DependentUpon>FormCompras.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormConfiguracion.resx">
+      <DependentUpon>FormConfiguracion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormDetalles.resx">
+      <DependentUpon>FormDetalles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormPrincipal.resx">
+      <DependentUpon>FormPrincipal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormProveedores.resx">
+      <DependentUpon>FormProveedores.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormVentas.resx">
+      <DependentUpon>FormVentas.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Gerente.resx">
+      <DependentUpon>Gerente.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
