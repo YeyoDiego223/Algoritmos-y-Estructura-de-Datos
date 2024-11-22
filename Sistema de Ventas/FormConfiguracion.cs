@@ -48,5 +48,12 @@ namespace Sistema_de_Ventas
             FormDetalles detalles = new FormDetalles();
             detalles.Show();
         }
+
+        private void btnSalir_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            FormPrincipal principal = new FormPrincipal();
+            principal.Show();
+        }
     }
 }

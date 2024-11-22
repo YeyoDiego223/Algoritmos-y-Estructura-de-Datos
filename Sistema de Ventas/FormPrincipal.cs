@@ -57,5 +57,12 @@ namespace Sistema_de_Ventas
             FormConfiguracion configuracion = new FormConfiguracion();
             configuracion.Show();
         }
+
+        private void pictureBox7_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form1 IniciarSesion = new Form1();
+            IniciarSesion.Show();
+        }
     }
 }

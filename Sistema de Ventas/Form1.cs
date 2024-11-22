@@ -34,9 +34,14 @@ namespace Sistema_de_Ventas
 
         }
 
-        private void txtContraseña_TextChanged(object sender, EventArgs e)
+       private void txtContraseña_KeyDown(object sender, KeyEventArgs e)
         {
-
+            if (e.KeyCode == Keys.Enter) //Verifica si se presiono la tecla Enter
+            {
+                pictureBox1.PerformLayout(); // Ejecuta el evento
+                e.Handled = true; // Marca el evento como manejado
+               e.SuppressKeyPress = true; //Evita el sonido "beep"
+            }
         }
 
 
@@ -67,6 +72,25 @@ namespace Sistema_de_Ventas
                 this.Hide();
                 Cajero formcajero = new Cajero();
                 formcajero.Show();
+            }
+        }
+
+        private void txtContraseña_Enter(object sender, EventArgs e)
+        {
+        }
+
+        private void txtContraseña_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtContraseña_KeyDown_1(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter) // Verifica si se presionó la tecla Enter
+            {
+                pictureBox2_Click(sender, e); // Ejecuta el evento Click del botón
+                e.Handled = true; // Marca el evento como manejado
+                e.SuppressKeyPress = true; // Evita el sonido de "beep"
             }
         }
     }

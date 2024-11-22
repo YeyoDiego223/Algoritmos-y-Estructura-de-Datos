@@ -50,5 +50,17 @@ namespace Sistema_de_Ventas
             FormClientes clientes = new FormClientes();
             clientes.Show();
         }
+
+        private void btnSalir_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            FormPrincipal principal = new FormPrincipal();
+            principal.Show();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
