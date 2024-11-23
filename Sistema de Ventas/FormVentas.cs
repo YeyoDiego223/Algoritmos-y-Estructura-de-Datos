@@ -55,10 +55,17 @@ namespace Sistema_de_Ventas
             producto = txtProducto.Text;
             precio = txtPrecio.Text;
             cantidad = txtCantidad.Text;
-            dgvDetalle.Rows.Add(1 + "", producto, precio, cantidad);
-            i = i + 1;
-            limpiar();
-            txtProducto.Focus();
+            if (producto == "" && precio == "" && cantidad == "")
+            {
+                MessageBox.Show("No hay datos en algunos textos");
+            }
+            else
+            {
+                dgvDetalle.Rows.Add(i + "", producto, precio, cantidad);
+                i = i + 1;
+                limpiar();
+                txtProducto.Focus();
+            }
         }
 
         private void btnModificar_Click(object sender, EventArgs e)
@@ -148,7 +155,7 @@ namespace Sistema_de_Ventas
         private void pictureBox6_Click(object sender, EventArgs e)
         {
             this.Hide();
-            FormConfiguracion configuracion = new FormConfiguracion();
+            FormProductos configuracion = new FormProductos();
             configuracion.Show();
         }
 

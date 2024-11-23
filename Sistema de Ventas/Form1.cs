@@ -51,7 +51,7 @@ namespace Sistema_de_Ventas
         }
 
         private void pictureBox2_Click(object sender, EventArgs e)
-        {
+        { 
             string usuario = cbxUsuario.Text;//Se declaran las variables tomándolas direcramente del elemento grafico
             string pass = txtContraseña.Text;
 

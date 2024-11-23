@@ -14,7 +14,7 @@ namespace Sistema_de_Ventas
     {
         int i = 1;
         int posicion;
-        string nombre, telefono, email;
+        string nombre, contacto, telefono, email;
         public FormProveedores()
         {
             InitializeComponent();
@@ -25,6 +25,7 @@ namespace Sistema_de_Ventas
             btnEliminar.Enabled = false;
             btnModificar.Enabled = false;
             txtNombre.Text = "";
+            txtContacto.Text = "";
             txtTelefono.Text = "";
             txtEmail.Text = "";
         }
@@ -75,7 +76,7 @@ namespace Sistema_de_Ventas
         private void pictureBox6_Click(object sender, EventArgs e)
         {
             this.Hide();
-            FormConfiguracion configuracion = new FormConfiguracion();
+            FormProductos configuracion = new FormProductos();
             configuracion.Show();
         }
 
@@ -92,12 +93,21 @@ namespace Sistema_de_Ventas
         private void btnAgregar_Click(object sender, EventArgs e)
         {
             nombre = txtNombre.Text;
+            contacto = txtContacto.Text;
             telefono = txtTelefono.Text;
             email = txtEmail.Text;
-            dgvDetalle.Rows.Add(1 + "", nombre, telefono, email);
-            i = i + 1;
-            limpiar();
-            txtNombre.Focus();
+            if (nombre == "" && telefono == "" && email == "")
+            {
+                MessageBox.Show("No hay datos");
+            }
+            else
+            {
+                dgvDetalle.Rows.Add(i + "", nombre, telefono, email);
+                i = i + 1;
+                limpiar();
+                txtNombre.Focus();
+            }
+
         }
 
         private void txtNombre_KeyDown(object sender, KeyEventArgs e)
@@ -139,8 +149,9 @@ namespace Sistema_de_Ventas
                 {
                     posicion = dgvDetalle.CurrentRow.Index;
                     txtNombre.Text = dgvDetalle[1, posicion].Value.ToString();
-                    txtTelefono.Text = dgvDetalle[2, posicion].Value.ToString();
-                    txtEmail.Text = dgvDetalle[3, posicion].Value.ToString();
+                    txtContacto.Text = dgvDetalle[2, posicion].Value.ToString();
+                    txtTelefono.Text = dgvDetalle[3, posicion].Value.ToString();
+                    txtEmail.Text = dgvDetalle[4, posicion].Value.ToString();
                     btnAgregar.Enabled = false;
                     btnModificar.Enabled = true;
                     btnEliminar.Enabled = true;
@@ -161,6 +172,61 @@ namespace Sistema_de_Ventas
             principal.Show();
         }
 
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtContacto_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dgvDetalle_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void pictureBox10_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox9_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox2_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtEmail_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtTelefono_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtNombre_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label6_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
         private void btnEliminar_Click(object sender, EventArgs e)
         {
             dgvDetalle.Rows.RemoveAt(posicion);
@@ -177,9 +243,11 @@ namespace Sistema_de_Ventas
         private void btnModificar_Click(object sender, EventArgs e)
         {
             nombre = txtNombre.Text;
+            contacto = txtContacto.Text;
             telefono = txtTelefono.Text;
             email = txtEmail.Text;
             dgvDetalle[1, posicion].Value = txtNombre.Text;
+            dgvDetalle[2, posicion].Value = txtContacto.Text;
             dgvDetalle[2, posicion].Value = txtTelefono.Text;
             dgvDetalle[3, posicion].Value = txtEmail.Text;
             limpiar();

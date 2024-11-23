@@ -13,6 +13,7 @@ namespace Sistema_de_Ventas
     {
         int i = 1;
         int posicion;
+        string nombre, apellido, email, tel, direcc;
         public FormClientes()
         {
             InitializeComponent();
@@ -70,7 +71,7 @@ namespace Sistema_de_Ventas
         private void pictureBox6_Click(object sender, EventArgs e)
         {
             this.Hide();
-            FormConfiguracion configuracion = new FormConfiguracion();
+            FormProductos configuracion = new FormProductos();
             configuracion.Show();
         }
 
@@ -81,16 +82,24 @@ namespace Sistema_de_Ventas
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string nombre, apellido, email, tel, direcc;
             nombre = txtNombre.Text;
             apellido = txtApellido.Text;
             email = txtEmail.Text;
             tel = txtTelefono.Text;
             direcc = txtDireccion.Text;
-            dgvDetalle.Rows.Add(1 + "", nombre, apellido, email, tel, direcc);
-            i = i + 1;
-            limpiar();
-            txtNombre.Focus();
+            if (nombre == "" && apellido == "" && email == "" && tel == "" && direcc == "")
+            {
+                MessageBox.Show("No hay datos en algunos textos");
+            }
+            else
+            {
+                
+                dgvDetalle.Rows.Add(i + "", nombre, apellido, email, tel, direcc);
+                i = i + 1;
+                limpiar();
+                txtNombre.Focus();
+            }
+            
         }
 
         private void btnEliminar_Click(object sender, EventArgs e)

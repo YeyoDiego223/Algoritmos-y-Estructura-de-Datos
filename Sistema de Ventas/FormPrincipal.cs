@@ -54,7 +54,7 @@ namespace Sistema_de_Ventas
         public void pictureBox6_Click(object sender, EventArgs e)
         {
             this.Hide();
-            FormConfiguracion configuracion = new FormConfiguracion();
+            FormProductos configuracion = new FormProductos();
             configuracion.Show();
         }
 
