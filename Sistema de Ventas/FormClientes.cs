@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace Sistema_de_Ventas
@@ -17,10 +18,130 @@ namespace Sistema_de_Ventas
         public FormClientes()
         {
             InitializeComponent();
+            llenarDataGridView();
+            txtNombre.Focus();
+        }
+
+        void eliminarbase()
+        {
+            posicion = dgvDetalle.CurrentRow.Index;
+            var id = dgvDetalle[0, posicion].Value.ToString();
+            // Conexion
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+            string query = @"DELETE FROM Clientes WHERE ID_Cliente = @idCliente";
+
+            // 1. Conexion y comando
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    // 2. Parámetros para evitar SQL Injection
+                    cmd.Parameters.AddWithValue("@idCliente", id);
+
+                    try
+                    {
+                        // 3. Abrír conexión y ejecutar comando
+
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Cliente eliminado correctamente.");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error al eliminar Cliente: {ex.Message}");
+                    }
+
+                }
+
+            }
+        }
+
+        void modificarbase()
+        {
+            posicion = dgvDetalle.CurrentRow.Index;
+            var id = dgvDetalle[0, posicion].Value.ToString();
+            var nombre = dgvDetalle[1, posicion].Value.ToString();
+            var apellido = dgvDetalle[2, posicion].Value.ToString();
+            var email = dgvDetalle[3, posicion].Value.ToString();
+            var tel = dgvDetalle[4, posicion].Value.ToString();
+            var direcc = dgvDetalle[5, posicion].Value.ToString();
+            // Conexión
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+            string query = @"
+        UPDATE Clientes 
+        SET Nombre = @nombre, 
+            Apellido = @apellido, 
+            Email = @email, 
+            Telefono = @telefono, 
+            Direccion = @direccion
+        WHERE ID_Cliente = @idCliente";
+            // 1. Conexión y comando
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                // 2. Parámetros para evitar SQL Injection
+                cmd.Parameters.AddWithValue("@idCliente", id);
+                cmd.Parameters.AddWithValue("@nombre", nombre);
+                cmd.Parameters.AddWithValue("@apellido", apellido);
+                cmd.Parameters.AddWithValue("@email", email);
+                cmd.Parameters.AddWithValue("@telefono", tel);
+                cmd.Parameters.AddWithValue("@direccion", direcc);
+
+                try
+                {
+                    // 3. Abrír conexión y ejecutar comando
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Cliente actualizado correctamente.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al actualizar Cliente: {ex.Message}");
+                }
+            }
+        }
+
+        private void llenarDataGridView()
+        {
+            // Cadena de conexion
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+
+            // Consulta SQL
+            string query = "Select ID_Cliente, Nombre, Apellido, Email, Telefono, Direccion FROM Clientes";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            // Crear una nueva fila y asignar los valores manualmente
+                            int rowIndex = dgvDetalle.Rows.Add();
+                            dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = reader["ID_Cliente"];
+                            dgvDetalle.Rows[rowIndex].Cells["colNombre"].Value = reader["Nombre"];
+                            dgvDetalle.Rows[rowIndex].Cells["colApellido"].Value = reader["Apellido"];
+                            dgvDetalle.Rows[rowIndex].Cells["colEmail"].Value = reader["Email"];
+                            dgvDetalle.Rows[rowIndex].Cells["colTelefono"].Value = reader["Telefono"];
+                            dgvDetalle.Rows[rowIndex].Cells["colDireccion"].Value = reader["Direccion"];
+                            i = i + 1;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}");
+                }
+            }
         }
 
         void limpiar()
         {
+            btnAgregar.Enabled = true;
             btnEliminar.Enabled = false;
             btnModificar.Enabled = false;
             txtNombre.Text = "";
@@ -87,15 +208,38 @@ namespace Sistema_de_Ventas
             email = txtEmail.Text;
             tel = txtTelefono.Text;
             direcc = txtDireccion.Text;
-            if (nombre == "" && apellido == "" && email == "" && tel == "" && direcc == "")
+            if (nombre == "" || apellido == "" || email == "" || tel == "" || direcc == "")
             {
-                MessageBox.Show("No hay datos en algunos textos");
+                MessageBox.Show("No hay datos");
             }
             else
             {
                 
                 dgvDetalle.Rows.Add(i + "", nombre, apellido, email, tel, direcc);
                 i = i + 1;
+                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+                string query = "INSERT INTO Clientes (Nombre, Apellido, Email, Telefono, Direccion) " +
+                       "VALUES (@nombre, @apellido, @email, @telefono, @direccion)";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@apellido", apellido);
+                    cmd.Parameters.AddWithValue("@email", email);
+                    cmd.Parameters.AddWithValue("@telefono", tel);
+                    cmd.Parameters.AddWithValue("@direccion", direcc);
+
+                    try
+                    {
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Clientes agregado.");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error al agregar cliente {ex.Message}");
+                    }
+                }
                 limpiar();
                 txtNombre.Focus();
             }
@@ -104,8 +248,16 @@ namespace Sistema_de_Ventas
 
         private void btnEliminar_Click(object sender, EventArgs e)
         {
-            dgvDetalle.Rows.RemoveAt(posicion);
-            txtNombre.Focus();
+            DialogResult result = MessageBox.Show("¿Estas seguro que deseas eliminar este cliente?",
+                                                    "Confirmacion", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                eliminarbase();
+                dgvDetalle.Rows.RemoveAt(posicion);
+                limpiar();
+                txtNombre.Focus();
+            }
+            
         }
 
         private void btnModificar_Click(object sender, EventArgs e)
@@ -121,6 +273,7 @@ namespace Sistema_de_Ventas
             dgvDetalle[3, posicion].Value = txtEmail.Text;
             dgvDetalle[4, posicion].Value = txtTelefono.Text;
             dgvDetalle[5, posicion].Value = txtDireccion.Text;
+            modificarbase();
             limpiar();
             txtNombre.Focus();
         }

@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace Sistema_de_Ventas
@@ -18,13 +19,164 @@ namespace Sistema_de_Ventas
         public FormProveedores()
         {
             InitializeComponent();
+            llenarDataGridView();
+            cbxNombre.Focus();
+            llenarcombobox();
+        }
+
+         void eliminarbase()
+        {
+            posicion = dgvDetalle.CurrentRow.Index;
+            var id = dgvDetalle[0, posicion].Value.ToString();
+            // Conexion
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+            string query = @"DELETE FROM Proveedores WHERE ID_Proveedor = @idProveedor";
+
+            // 1. Conexion y comando
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    // 2. Parametros para evitar SQLL Injection
+                    cmd.Parameters.AddWithValue("@idProveedor", id);
+
+                    try
+                    {
+                        // 3. Abrir conexion y ejecutar comando
+
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Proveedor eliminado correctamente.");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error al eliminar Proveedor: {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        void modificarbase()
+        {
+            posicion = dgvDetalle.CurrentRow.Index;
+            var id = dgvDetalle[0, posicion].Value.ToString();
+            var nombre = dgvDetalle[1, posicion].Value.ToString();
+            var contacto = dgvDetalle[2, posicion].Value.ToString();
+            var telefono = dgvDetalle[3, posicion].Value.ToString();
+            var email = dgvDetalle[4, posicion].Value.ToString();
+            // Conexion
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+            string query = @"
+        UPDATE Proveedores
+        SET Nombre_Proveedor = @nombre,
+            Contacto = @contacto,
+            Telefono = @telefono,
+            Email = @email
+        WHERE ID_Proveedor = @idProveedor";
+            // 1. Conexion y comando
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                // 2. Parametros para evitar SQL Injection
+                cmd.Parameters.AddWithValue("@idProveedor", id);
+                cmd.Parameters.AddWithValue("@nombre", nombre);
+                cmd.Parameters.AddWithValue("@contacto", contacto);
+                cmd.Parameters.AddWithValue("@telefono", telefono);
+                cmd.Parameters.AddWithValue("@email", email);
+
+                try
+                {
+                    // 3. Abrir conexion y ejecutar comando
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Proveedor actualizado correctamente.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al actualizar Proveedor: {ex.Message}");
+                }
+            }
+        }
+
+        void llenarcombobox()
+        {
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+            string query = "SELECT Nombre_Proveedor FROM Proveedores";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        conn.Open(); // abre la conexion
+                        SqlDataReader reader = cmd.ExecuteReader(); // Ejecuta la consulta
+
+                        //Limpia el combobox antes de llenarlo
+                        cbxNombre.Items.Clear();
+
+                        //Itera por cada fila y añade los datos al combobox
+                        while (reader.Read())
+                        {
+                            cbxNombre.Items.Add(reader["Nombre_Proveedor"].ToString());
+                        }
+
+                        // Seleciona el primer elemento por defecto
+                        if (cbxNombre.Items.Count > 0)
+                        {
+                            cbxNombre.SelectedIndex = 0;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al llenar el ComboBox: {ex.Message}");
+            }
+        }
+
+        private void llenarDataGridView()
+        {
+            // Cadena de conexion
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+
+            // Consulta SQL
+            string query = "Select ID_Proveedor, Nombre_Proveedor, Contacto, Telefono, Email FROM Proveedores";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            // Crear una nueva fila y asignar los valores manualmente
+                            int rowIndex = dgvDetalle.Rows.Add();
+                            dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = reader["ID_Proveedor"];
+                            dgvDetalle.Rows[rowIndex].Cells["colNombre"].Value = reader["Nombre_Proveedor"];
+                            dgvDetalle.Rows[rowIndex].Cells["colContacto"].Value = reader["Contacto"];
+                            dgvDetalle.Rows[rowIndex].Cells["colTelefono"].Value = reader["Telefono"];
+                            dgvDetalle.Rows[rowIndex].Cells["colEmail"].Value = reader["Email"];
+                            i = i + 1;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}");
+                }
+            }
         }
 
         void limpiar()
         {
             btnEliminar.Enabled = false;
             btnModificar.Enabled = false;
-            txtNombre.Text = "";
+            cbxNombre.Text = "";
             txtContacto.Text = "";
             txtTelefono.Text = "";
             txtEmail.Text = "";
@@ -90,25 +242,7 @@ namespace Sistema_de_Ventas
 
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
-        {
-            nombre = txtNombre.Text;
-            contacto = txtContacto.Text;
-            telefono = txtTelefono.Text;
-            email = txtEmail.Text;
-            if (nombre == "" && telefono == "" && email == "")
-            {
-                MessageBox.Show("No hay datos");
-            }
-            else
-            {
-                dgvDetalle.Rows.Add(i + "", nombre, telefono, email);
-                i = i + 1;
-                limpiar();
-                txtNombre.Focus();
-            }
 
-        }
 
         private void txtNombre_KeyDown(object sender, KeyEventArgs e)
         {
@@ -148,14 +282,14 @@ namespace Sistema_de_Ventas
                 if (filaSeleccionada.Cells[0].Value != null && filaSeleccionada.Cells[1].Value != null)
                 {
                     posicion = dgvDetalle.CurrentRow.Index;
-                    txtNombre.Text = dgvDetalle[1, posicion].Value.ToString();
+                    cbxNombre.Text = dgvDetalle[1, posicion].Value.ToString();
                     txtContacto.Text = dgvDetalle[2, posicion].Value.ToString();
                     txtTelefono.Text = dgvDetalle[3, posicion].Value.ToString();
                     txtEmail.Text = dgvDetalle[4, posicion].Value.ToString();
                     btnAgregar.Enabled = false;
                     btnModificar.Enabled = true;
                     btnEliminar.Enabled = true;
-                    txtNombre.Focus();
+                    cbxNombre.Focus();
                 }
                 else
                 {
@@ -227,31 +361,86 @@ namespace Sistema_de_Ventas
 
         }
 
+        private void txtContacto_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter) // Verifica si se presionó la tecla Enter
+            {
+                txtTelefono.Focus(); // Pasa el foco al siguiente TextBox
+                e.Handled = true; // Marca el evento como manejado
+                e.SuppressKeyPress = true; // Evita el sonido de "beep"
+            }
+        }
+
+        private void btnAgregar_Click(object sender, EventArgs e)
+        {
+            nombre = cbxNombre.Text;
+            contacto = txtContacto.Text;
+            telefono = txtTelefono.Text;
+            email = txtEmail.Text;
+            if (nombre == "" || telefono == "" || email == "")
+            {
+                MessageBox.Show("No hay datos");
+            }
+            else
+            {
+                dgvDetalle.Rows.Add(i + "", nombre, contacto, telefono, email);
+                i = i + 1;
+                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+                string query = "INSERT INTO Proveedores (Nombre_Proveedor, Contacto, Telefono, Email)" +
+                    "VALUES (@nombre, @contacto, @telefono, @email)";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@contacto", contacto);
+                    cmd.Parameters.AddWithValue("@telefono", telefono);
+                    cmd.Parameters.AddWithValue("@email", email);
+
+                    try
+                    {
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Proveedor agregado.");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error al agregar proveedor {ex.Message}");
+                    }
+                }
+                limpiar();
+                cbxNombre.Focus();
+            }
+
+        }
+
         private void btnEliminar_Click(object sender, EventArgs e)
         {
+            eliminarbase();
             dgvDetalle.Rows.RemoveAt(posicion);
-            txtNombre.Focus();
+            limpiar();
+            cbxNombre.Focus();
         }
 
         private void btnNuevo_Click(object sender, EventArgs e)
         {
             limpiar();
             btnAgregar.Enabled = true;
-            txtNombre.Focus();
+            cbxNombre.Focus();
         }
 
         private void btnModificar_Click(object sender, EventArgs e)
         {
-            nombre = txtNombre.Text;
+            nombre = cbxNombre.Text;
             contacto = txtContacto.Text;
             telefono = txtTelefono.Text;
             email = txtEmail.Text;
-            dgvDetalle[1, posicion].Value = txtNombre.Text;
+            dgvDetalle[1, posicion].Value = cbxNombre.Text;
             dgvDetalle[2, posicion].Value = txtContacto.Text;
-            dgvDetalle[2, posicion].Value = txtTelefono.Text;
-            dgvDetalle[3, posicion].Value = txtEmail.Text;
+            dgvDetalle[3, posicion].Value = txtTelefono.Text;
+            dgvDetalle[4, posicion].Value = txtEmail.Text;
+            modificarbase();
             limpiar();
-            txtNombre.Focus();
+            cbxNombre.Focus();
         }
     }
 }

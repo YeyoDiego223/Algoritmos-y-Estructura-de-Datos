@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace Sistema_de_Ventas
@@ -18,7 +19,49 @@ namespace Sistema_de_Ventas
         public FormVentas()
         {
             InitializeComponent();
-            txtPrecio.Focus();
+            llenarDataGridView();
+            txtProducto.Focus();
+        }
+
+        private void actualizarbase()
+        {
+
+        }
+
+        private void llenarDataGridView()
+        {
+            // Cadena de conexion
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+
+            // Consulta SQL
+            string query = "Select ID_Venta, Fecha_Venta, ID_Cliente, Total_Venta FROM Ventas";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            // Crear una nueva fila y asignar los valores manualmente
+                            int rowIndex = dgvDetalle.Rows.Add();
+                            dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = reader["ID_Venta"];
+                            dgvDetalle.Rows[rowIndex].Cells["colProducto"].Value = reader["Fecha_Venta"];
+                            dgvDetalle.Rows[rowIndex].Cells["colPrecio"].Value = reader["ID_Cliente"];
+                            dgvDetalle.Rows[rowIndex].Cells["colCantidad"].Value = reader["Total_Venta"];
+                            i = i + 1;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}");
+                }
+            }
         }
 
         void limpiar()
@@ -55,7 +98,7 @@ namespace Sistema_de_Ventas
             producto = txtProducto.Text;
             precio = txtPrecio.Text;
             cantidad = txtCantidad.Text;
-            if (producto == "" && precio == "" && cantidad == "")
+            if (producto == "" || precio == "" || cantidad == "")
             {
                 MessageBox.Show("No hay datos en algunos textos");
             }
@@ -63,6 +106,7 @@ namespace Sistema_de_Ventas
             {
                 dgvDetalle.Rows.Add(i + "", producto, precio, cantidad);
                 i = i + 1;
+                
                 limpiar();
                 txtProducto.Focus();
             }
@@ -76,6 +120,8 @@ namespace Sistema_de_Ventas
             dgvDetalle[1, posicion].Value = txtProducto.Text;
             dgvDetalle[2, posicion].Value = txtPrecio.Text;
             dgvDetalle[3, posicion].Value = txtCantidad.Text;
+            var colCodigo = dgvDetalle[0, posicion].Value.ToString();
+            actualizarbase();
             limpiar();
             txtProducto.Focus();
         }

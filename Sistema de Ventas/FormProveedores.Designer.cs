@@ -41,24 +41,24 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.txtNombre = new System.Windows.Forms.TextBox();
             this.txtTelefono = new System.Windows.Forms.TextBox();
             this.txtEmail = new System.Windows.Forms.TextBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox9 = new System.Windows.Forms.PictureBox();
             this.pictureBox10 = new System.Windows.Forms.PictureBox();
             this.dgvDetalle = new System.Windows.Forms.DataGridView();
+            this.colCodigo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colNombre = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colContacto = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colTelefono = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colEmail = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnModificar = new System.Windows.Forms.Button();
             this.btnEliminar = new System.Windows.Forms.Button();
             this.btnAgregar = new System.Windows.Forms.Button();
             this.btnNuevo = new System.Windows.Forms.Button();
             this.txtContacto = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.Codigo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Nombre1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Contacto1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Telefono1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Email1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cbxNombre = new System.Windows.Forms.ComboBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnSalir)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -209,15 +209,6 @@
             this.label6.Text = "Email";
             this.label6.Click += new System.EventHandler(this.label6_Click);
             // 
-            // txtNombre
-            // 
-            this.txtNombre.Location = new System.Drawing.Point(291, 68);
-            this.txtNombre.Name = "txtNombre";
-            this.txtNombre.Size = new System.Drawing.Size(326, 20);
-            this.txtNombre.TabIndex = 7;
-            this.txtNombre.TextChanged += new System.EventHandler(this.txtNombre_TextChanged);
-            this.txtNombre.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtNombre_KeyDown);
-            // 
             // txtTelefono
             // 
             this.txtTelefono.Location = new System.Drawing.Point(294, 214);
@@ -273,17 +264,41 @@
             // 
             this.dgvDetalle.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDetalle.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Codigo,
-            this.Nombre1,
-            this.Contacto1,
-            this.Telefono1,
-            this.Email1});
+            this.colCodigo,
+            this.colNombre,
+            this.colContacto,
+            this.colTelefono,
+            this.colEmail});
             this.dgvDetalle.Location = new System.Drawing.Point(291, 399);
             this.dgvDetalle.Name = "dgvDetalle";
             this.dgvDetalle.Size = new System.Drawing.Size(685, 238);
             this.dgvDetalle.TabIndex = 15;
             this.dgvDetalle.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDetalle_CellClick);
-            this.dgvDetalle.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDetalle_CellContentClick);
+            // 
+            // colCodigo
+            // 
+            this.colCodigo.HeaderText = "Codigo";
+            this.colCodigo.Name = "colCodigo";
+            // 
+            // colNombre
+            // 
+            this.colNombre.HeaderText = "Nombre";
+            this.colNombre.Name = "colNombre";
+            // 
+            // colContacto
+            // 
+            this.colContacto.HeaderText = "Contacto";
+            this.colContacto.Name = "colContacto";
+            // 
+            // colTelefono
+            // 
+            this.colTelefono.HeaderText = "Telefono";
+            this.colTelefono.Name = "colTelefono";
+            // 
+            // colEmail
+            // 
+            this.colEmail.HeaderText = "Email";
+            this.colEmail.Name = "colEmail";
             // 
             // btnModificar
             // 
@@ -336,6 +351,7 @@
             this.txtContacto.Size = new System.Drawing.Size(326, 20);
             this.txtContacto.TabIndex = 52;
             this.txtContacto.TextChanged += new System.EventHandler(this.txtContacto_TextChanged);
+            this.txtContacto.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtContacto_KeyDown);
             // 
             // label2
             // 
@@ -348,36 +364,20 @@
             this.label2.Text = "Contacto";
             this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
-            // Codigo
+            // cbxNombre
             // 
-            this.Codigo.HeaderText = "Codigo";
-            this.Codigo.Name = "Codigo";
-            // 
-            // Nombre1
-            // 
-            this.Nombre1.HeaderText = "Nombre";
-            this.Nombre1.Name = "Nombre1";
-            // 
-            // Contacto1
-            // 
-            this.Contacto1.HeaderText = "Contacto";
-            this.Contacto1.Name = "Contacto1";
-            // 
-            // Telefono1
-            // 
-            this.Telefono1.HeaderText = "Telefono";
-            this.Telefono1.Name = "Telefono1";
-            // 
-            // Email1
-            // 
-            this.Email1.HeaderText = "Email";
-            this.Email1.Name = "Email1";
+            this.cbxNombre.FormattingEnabled = true;
+            this.cbxNombre.Location = new System.Drawing.Point(291, 67);
+            this.cbxNombre.Name = "cbxNombre";
+            this.cbxNombre.Size = new System.Drawing.Size(323, 21);
+            this.cbxNombre.TabIndex = 53;
             // 
             // FormProveedores
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(986, 779);
+            this.Controls.Add(this.cbxNombre);
             this.Controls.Add(this.txtContacto);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.btnNuevo);
@@ -390,7 +390,6 @@
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.txtEmail);
             this.Controls.Add(this.txtTelefono);
-            this.Controls.Add(this.txtNombre);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label3);
@@ -429,7 +428,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox txtNombre;
         private System.Windows.Forms.TextBox txtTelefono;
         private System.Windows.Forms.TextBox txtEmail;
         private System.Windows.Forms.PictureBox pictureBox2;
@@ -443,10 +441,11 @@
         private System.Windows.Forms.PictureBox btnSalir;
         private System.Windows.Forms.TextBox txtContacto;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Codigo;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Nombre1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Contacto1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Telefono1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Email1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCodigo;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colNombre;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colContacto;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colTelefono;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colEmail;
+        private System.Windows.Forms.ComboBox cbxNombre;
     }
 }

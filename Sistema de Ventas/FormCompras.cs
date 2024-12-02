@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace Sistema_de_Ventas
@@ -18,21 +19,127 @@ namespace Sistema_de_Ventas
         {
             InitializeComponent();
             cbxProveedor.DropDownStyle = ComboBoxStyle.DropDownList;
-            string query = "SELECT * FROM Compras";
-            Conexion conexion = new Conexion();
-            try
+            llenarDataGridView();
+            cbxProveedor.Focus();
+        }
+
+        void modificarbase()
+        {
+
+            var idCompra = dgvDetalle[0, posicion].Value.ToString();
+            fecha = dtpFecha.Text;
+            total = txtTotal.Text;
+            proveedor = cbxProveedor.Text;
+
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+            string getIdProveedorQuery = "SELECT ID_Proveedor FROM Proveedores WHERE Nombre_Proveedor = @nombreProveedor";
+            int idProveedor;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand(getIdProveedorQuery, conn))
             {
-                DataTable datos = conexion.ObtenerDatos(query);
-                dgvDetalle.DataSource = datos;
+                cmd.Parameters.AddWithValue("@nombreProveedor", proveedor);
+
+                try
+                {
+                    conn.Open();
+                    object result = cmd.ExecuteScalar();
+                    if (result == null)
+                    {
+                        MessageBox.Show("Proveedor no encontrado");
+                        return;
+                    }
+                    idProveedor = (int)result;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al obtener ID del proveedor: {ex.Message}");
+                    return;
+                }
             }
-            catch (Exception ex)
+
+            // Actualizar la tabla de compras
+            string updateQuery = "UPDATE Compras SET ID_Proveedor = @idProveedor, Fecha_Compra = @fechaCompra, Total_Compra = @totalCompra WHERE ID_Compra = @idCompra";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
             {
-                MessageBox.Show($"Ocurrió un error: {ex.Message}");
+                cmd.Parameters.AddWithValue("@idProveedor", proveedor);
+                cmd.Parameters.AddWithValue("@fechaCompra", fecha);
+                cmd.Parameters.AddWithValue("@totalCompra", total);
+                cmd.Parameters.AddWithValue("@idCompra", idCompra);
+
+                try
+                {
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    if(rowsAffected > 0)
+                    {
+                        MessageBox.Show("Registro modificado correctamente.");
+                        llenarDataGridView();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se encontró el registro para modificar.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al modificar: {ex.Message}");
+                }
             }
         }
-        
+
+
+
+        private void llenarDataGridView()
+        {
+            // Cadena de conexion
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+
+            // Consulta SQL
+            string query = @"
+            SELECT 
+                c.ID_Compra, 
+                p.Nombre_Proveedor,
+                c.Fecha_Compra,
+                c.Total_Compra
+            FROM Compras c
+            INNER JOIN Proveedores p 
+            ON c.ID_Proveedor = p.ID_Proveedor";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            // Crear una nueva fila y asignar los valores manualmente
+                            int rowIndex = dgvDetalle.Rows.Add();
+                            dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = reader["ID_Compra"];
+                            dgvDetalle.Rows[rowIndex].Cells["colProveedor"].Value = reader["Nombre_Proveedor"];
+                            dgvDetalle.Rows[rowIndex].Cells["colFecha"].Value = reader["Fecha_Compra"];
+                            dgvDetalle.Rows[rowIndex].Cells["colTotal"].Value = reader["Total_Compra"];
+                            i = i + 1;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}");
+                }
+            }
+        }
+
         void limpiar()
         {
+            btnAgregar.Enabled = true;
             btnEliminar.Enabled = false;
             btnModificar.Enabled = false;
             cbxProveedor.Text = "";
@@ -79,7 +186,7 @@ namespace Sistema_de_Ventas
             proveedor = cbxProveedor.Text;
             fecha = dtpFecha.Text;
             total = txtTotal.Text;
-            if (proveedor == "" && fecha == "" && total == "")
+            if (proveedor == "" || fecha == "" || total == "")
             {
                 MessageBox.Show("No hay datos");
             }
@@ -110,13 +217,29 @@ namespace Sistema_de_Ventas
         {
             if (e.RowIndex >= 0) // Verifica que no sea el encabezado
             {
-                DataGridViewRow filasSeleccionada = dgvDetalle.Rows[e.RowIndex];
-                if (filasSeleccionada.Cells[0].Value != null && filasSeleccionada.Cells[1].Value != null)
+                
+                // Obtener la fila seleccionada
+                DataGridViewRow row = dgvDetalle.Rows[e.RowIndex];
+                if (row.Cells[0].Value != null && row.Cells[1].Value != null)
                 {
-                    posicion = dgvDetalle.CurrentRow.Index;
-                    cbxProveedor.Text = dgvDetalle[1, posicion].Value.ToString();
-                    dtpFecha.Text = dgvDetalle[2, posicion].Value.ToString();
-                    txtTotal.Text = dgvDetalle[3, posicion].Value.ToString();
+                    // Llenar los TextBox con los valores correspondientes
+                    dtpFecha.Text = row.Cells["colFecha"].Value?.ToString();
+                    txtTotal.Text = row.Cells["colTotal"].Value?.ToString();
+
+                    // Obtener el nombre del proveedor
+                    proveedor = row.Cells["colProveedor"].Value?.ToString();
+
+                    // Verificar si el ComboBox contiene el proveedor
+                    if (cbxProveedor.Items.Contains(proveedor))
+                    {
+                        cbxProveedor.Text = proveedor;
+                    }
+                    else
+                    {
+                        // Si no esta en la lista, agregarlo y selecionarlo
+                        cbxProveedor.Items.Add(proveedor);
+                        cbxProveedor.Text = proveedor;
+                    }
                     btnAgregar.Enabled = false;
                     btnModificar.Enabled = true;
                     btnEliminar.Enabled = true;
@@ -124,7 +247,7 @@ namespace Sistema_de_Ventas
                 }
                 else
                 {
-                    MessageBox.Show("La fila seleccionada contiene celdas vacias");
+                    MessageBox.Show("La fila seleccionada contiene celdas vacías.");
                 }
 
             }
@@ -160,6 +283,11 @@ namespace Sistema_de_Ventas
             }
         }
 
+        private void dgvDetalle_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
         private void btnEliminar_Click(object sender, EventArgs e)
         {
             dgvDetalle.Rows.RemoveAt(posicion);
@@ -171,9 +299,11 @@ namespace Sistema_de_Ventas
             proveedor = cbxProveedor.Text;
             fecha = dtpFecha.Text;
             total = txtTotal.Text;
+
             dgvDetalle[1, posicion].Value = cbxProveedor.Text;
             dgvDetalle[2, posicion].Value = dtpFecha.Text;
             dgvDetalle[3, posicion].Value = txtTotal.Text;
+            modificarbase();
             limpiar();
             cbxProveedor.Focus();
         }

@@ -17,6 +17,8 @@ namespace Sistema_de_Ventas
         {
             InitializeComponent();
             cbxUsuario.DropDownStyle = ComboBoxStyle.DropDownList;//Desabilita el escribir en el combobox pero deja habilitado el seleccionar una opción
+            cbxUsuario.SelectedIndex = 0;
+
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -92,6 +94,11 @@ namespace Sistema_de_Ventas
                 e.Handled = true; // Marca el evento como manejado
                 e.SuppressKeyPress = true; // Evita el sonido de "beep"
             }
+        }
+
+        private void txtContraseña_TextChanged_1(object sender, EventArgs e)
+        {
+
         }
     }
 }
