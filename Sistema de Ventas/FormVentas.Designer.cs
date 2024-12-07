@@ -41,21 +41,21 @@
             this.pictureBox9 = new System.Windows.Forms.PictureBox();
             this.pictureBox8 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.txtCantidad = new System.Windows.Forms.TextBox();
+            this.txtTotal = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.txtPrecio = new System.Windows.Forms.TextBox();
-            this.txtProducto = new System.Windows.Forms.TextBox();
+            this.txtCliente = new System.Windows.Forms.TextBox();
+            this.txtFecha = new System.Windows.Forms.TextBox();
             this.btnNuevo = new System.Windows.Forms.Button();
             this.btnModificar = new System.Windows.Forms.Button();
             this.btnEliminar = new System.Windows.Forms.Button();
             this.btnAgregar = new System.Windows.Forms.Button();
             this.dgvDetalle = new System.Windows.Forms.DataGridView();
             this.colCodigo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colProducto = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colPrecio = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colCantidad = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colFecha = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colTotal = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnSalir)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -175,7 +175,7 @@
             // pictureBox9
             // 
             this.pictureBox9.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox9.Image")));
-            this.pictureBox9.Location = new System.Drawing.Point(543, 99);
+            this.pictureBox9.Location = new System.Drawing.Point(543, 161);
             this.pictureBox9.Name = "pictureBox9";
             this.pictureBox9.Size = new System.Drawing.Size(43, 43);
             this.pictureBox9.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -185,7 +185,7 @@
             // pictureBox8
             // 
             this.pictureBox8.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox8.Image")));
-            this.pictureBox8.Location = new System.Drawing.Point(543, 155);
+            this.pictureBox8.Location = new System.Drawing.Point(543, 38);
             this.pictureBox8.Name = "pictureBox8";
             this.pictureBox8.Size = new System.Drawing.Size(43, 43);
             this.pictureBox8.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -195,20 +195,20 @@
             // pictureBox2
             // 
             this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pictureBox2.Location = new System.Drawing.Point(543, 38);
+            this.pictureBox2.Location = new System.Drawing.Point(543, 97);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(43, 43);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox2.TabIndex = 34;
             this.pictureBox2.TabStop = false;
             // 
-            // txtCantidad
+            // txtTotal
             // 
-            this.txtCantidad.Location = new System.Drawing.Point(291, 193);
-            this.txtCantidad.Name = "txtCantidad";
-            this.txtCantidad.Size = new System.Drawing.Size(136, 20);
-            this.txtCantidad.TabIndex = 35;
-            this.txtCantidad.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtCantidad_KeyDown);
+            this.txtTotal.Location = new System.Drawing.Point(291, 193);
+            this.txtTotal.Name = "txtTotal";
+            this.txtTotal.Size = new System.Drawing.Size(136, 20);
+            this.txtTotal.TabIndex = 35;
+            this.txtTotal.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtCantidad_KeyDown);
             // 
             // label5
             // 
@@ -216,9 +216,9 @@
             this.label5.Font = new System.Drawing.Font("ChunkFive", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.Location = new System.Drawing.Point(285, 155);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(145, 35);
+            this.label5.Size = new System.Drawing.Size(88, 35);
             this.label5.TabIndex = 32;
-            this.label5.Text = "Cantidad";
+            this.label5.Text = "Total";
             // 
             // label4
             // 
@@ -226,9 +226,9 @@
             this.label4.Font = new System.Drawing.Font("ChunkFive", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.Location = new System.Drawing.Point(285, 23);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(142, 35);
+            this.label4.Size = new System.Drawing.Size(99, 35);
             this.label4.TabIndex = 31;
-            this.label4.Text = "Producto";
+            this.label4.Text = "Fecha";
             // 
             // label6
             // 
@@ -236,25 +236,25 @@
             this.label6.Font = new System.Drawing.Font("ChunkFive", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label6.Location = new System.Drawing.Point(285, 84);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(104, 35);
+            this.label6.Size = new System.Drawing.Size(117, 35);
             this.label6.TabIndex = 40;
-            this.label6.Text = "Precio";
+            this.label6.Text = "Cliente";
             // 
-            // txtPrecio
+            // txtCliente
             // 
-            this.txtPrecio.Location = new System.Drawing.Point(291, 122);
-            this.txtPrecio.Name = "txtPrecio";
-            this.txtPrecio.Size = new System.Drawing.Size(136, 20);
-            this.txtPrecio.TabIndex = 41;
-            this.txtPrecio.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPrecio_KeyDown);
+            this.txtCliente.Location = new System.Drawing.Point(291, 122);
+            this.txtCliente.Name = "txtCliente";
+            this.txtCliente.Size = new System.Drawing.Size(136, 20);
+            this.txtCliente.TabIndex = 41;
+            this.txtCliente.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPrecio_KeyDown);
             // 
-            // txtProducto
+            // txtFecha
             // 
-            this.txtProducto.Location = new System.Drawing.Point(288, 61);
-            this.txtProducto.Name = "txtProducto";
-            this.txtProducto.Size = new System.Drawing.Size(232, 20);
-            this.txtProducto.TabIndex = 42;
-            this.txtProducto.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtProducto_KeyDown);
+            this.txtFecha.Location = new System.Drawing.Point(288, 61);
+            this.txtFecha.Name = "txtFecha";
+            this.txtFecha.Size = new System.Drawing.Size(232, 20);
+            this.txtFecha.TabIndex = 42;
+            this.txtFecha.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtProducto_KeyDown);
             // 
             // btnNuevo
             // 
@@ -305,9 +305,9 @@
             this.dgvDetalle.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDetalle.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colCodigo,
-            this.colProducto,
-            this.colPrecio,
-            this.colCantidad});
+            this.colFecha,
+            this.colCliente,
+            this.colTotal});
             this.dgvDetalle.Location = new System.Drawing.Point(291, 323);
             this.dgvDetalle.Name = "dgvDetalle";
             this.dgvDetalle.Size = new System.Drawing.Size(646, 302);
@@ -319,20 +319,20 @@
             this.colCodigo.HeaderText = "Codigo";
             this.colCodigo.Name = "colCodigo";
             // 
-            // colProducto
+            // colFecha
             // 
-            this.colProducto.HeaderText = "Producto";
-            this.colProducto.Name = "colProducto";
+            this.colFecha.HeaderText = "Fecha";
+            this.colFecha.Name = "colFecha";
             // 
-            // colPrecio
+            // colCliente
             // 
-            this.colPrecio.HeaderText = "Precio";
-            this.colPrecio.Name = "colPrecio";
+            this.colCliente.HeaderText = "Cliente";
+            this.colCliente.Name = "colCliente";
             // 
-            // colCantidad
+            // colTotal
             // 
-            this.colCantidad.HeaderText = "Cantidad";
-            this.colCantidad.Name = "colCantidad";
+            this.colTotal.HeaderText = "Total";
+            this.colTotal.Name = "colTotal";
             // 
             // FormVentas
             // 
@@ -344,13 +344,13 @@
             this.Controls.Add(this.btnModificar);
             this.Controls.Add(this.btnEliminar);
             this.Controls.Add(this.btnAgregar);
-            this.Controls.Add(this.txtProducto);
-            this.Controls.Add(this.txtPrecio);
+            this.Controls.Add(this.txtFecha);
+            this.Controls.Add(this.txtCliente);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.pictureBox9);
             this.Controls.Add(this.pictureBox8);
             this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.txtCantidad);
+            this.Controls.Add(this.txtTotal);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.panel1);
@@ -387,12 +387,12 @@
         private System.Windows.Forms.PictureBox pictureBox9;
         private System.Windows.Forms.PictureBox pictureBox8;
         private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.TextBox txtCantidad;
+        private System.Windows.Forms.TextBox txtTotal;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox txtPrecio;
-        private System.Windows.Forms.TextBox txtProducto;
+        private System.Windows.Forms.TextBox txtCliente;
+        private System.Windows.Forms.TextBox txtFecha;
         private System.Windows.Forms.Button btnNuevo;
         private System.Windows.Forms.Button btnModificar;
         private System.Windows.Forms.Button btnEliminar;
@@ -400,8 +400,8 @@
         private System.Windows.Forms.DataGridView dgvDetalle;
         private System.Windows.Forms.PictureBox btnSalir;
         private System.Windows.Forms.DataGridViewTextBoxColumn colCodigo;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colProducto;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colPrecio;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colCantidad;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colFecha;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCliente;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colTotal;
     }
 }

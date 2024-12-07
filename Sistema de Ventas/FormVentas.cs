@@ -13,14 +13,14 @@ namespace Sistema_de_Ventas
     
     public partial class FormVentas : Form
     {
-        string producto, precio, cantidad;
+        string fecha, cliente, total;
         int posicion;
         int i = 1;
         public FormVentas()
         {
             InitializeComponent();
             llenarDataGridView();
-            txtProducto.Focus();
+            txtFecha.Focus();
         }
 
         private void actualizarbase()
@@ -34,7 +34,15 @@ namespace Sistema_de_Ventas
             string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
 
             // Consulta SQL
-            string query = "Select ID_Venta, Fecha_Venta, ID_Cliente, Total_Venta FROM Ventas";
+            string query = @"
+            SELECT 
+                v.ID_Venta,
+                v.Fecha_Venta,
+                c.Nombre,
+                v.Total_Venta
+            FROM Ventas v
+            INNER JOIN Clientes c
+            ON v.ID_Cliente = c.ID_Cliente";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -50,9 +58,9 @@ namespace Sistema_de_Ventas
                             // Crear una nueva fila y asignar los valores manualmente
                             int rowIndex = dgvDetalle.Rows.Add();
                             dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = reader["ID_Venta"];
-                            dgvDetalle.Rows[rowIndex].Cells["colProducto"].Value = reader["Fecha_Venta"];
-                            dgvDetalle.Rows[rowIndex].Cells["colPrecio"].Value = reader["ID_Cliente"];
-                            dgvDetalle.Rows[rowIndex].Cells["colCantidad"].Value = reader["Total_Venta"];
+                            dgvDetalle.Rows[rowIndex].Cells["colFecha"].Value = reader["Fecha_Venta"];
+                            dgvDetalle.Rows[rowIndex].Cells["colCliente"].Value = reader["Nombre"];
+                            dgvDetalle.Rows[rowIndex].Cells["colTotal"].Value = reader["Total_Venta"];
                             i = i + 1;
                         }
                     }
@@ -68,9 +76,9 @@ namespace Sistema_de_Ventas
         {
             btnEliminar.Enabled = false;
             btnModificar.Enabled = false;
-            txtProducto.Text = "";
-            txtPrecio.Text = "";
-            txtCantidad.Text = "";
+            txtFecha.Text = "";
+            txtCliente.Text = "";
+            txtTotal.Text = "";
         }
         private void pictureBox7_Click(object sender, EventArgs e)
         {
@@ -95,48 +103,48 @@ namespace Sistema_de_Ventas
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
-            producto = txtProducto.Text;
-            precio = txtPrecio.Text;
-            cantidad = txtCantidad.Text;
-            if (producto == "" || precio == "" || cantidad == "")
+            fecha = txtFecha.Text;
+            cliente = txtCliente.Text;
+            total = txtTotal.Text;
+            if (fecha == "" || cliente == "" || total == "")
             {
                 MessageBox.Show("No hay datos en algunos textos");
             }
             else
             {
-                dgvDetalle.Rows.Add(i + "", producto, precio, cantidad);
+                dgvDetalle.Rows.Add(i + "", fecha, cliente, total);
                 i = i + 1;
                 
                 limpiar();
-                txtProducto.Focus();
+                txtFecha.Focus();
             }
         }
 
         private void btnModificar_Click(object sender, EventArgs e)
         {
-            producto = txtProducto.Text;
-            precio = txtPrecio.Text;
-            cantidad = txtCantidad.Text;
-            dgvDetalle[1, posicion].Value = txtProducto.Text;
-            dgvDetalle[2, posicion].Value = txtPrecio.Text;
-            dgvDetalle[3, posicion].Value = txtCantidad.Text;
+            fecha = txtFecha.Text;
+            cliente = txtCliente.Text;
+            total = txtTotal.Text;
+            dgvDetalle[1, posicion].Value = txtFecha.Text;
+            dgvDetalle[2, posicion].Value = txtCliente.Text;
+            dgvDetalle[3, posicion].Value = txtTotal.Text;
             var colCodigo = dgvDetalle[0, posicion].Value.ToString();
             actualizarbase();
             limpiar();
-            txtProducto.Focus();
+            txtFecha.Focus();
         }
 
         private void btnEliminar_Click(object sender, EventArgs e)
         {
             dgvDetalle.Rows.RemoveAt(posicion);
-            txtProducto.Focus();
+            txtFecha.Focus();
         }
 
         private void btnNuevo_Click(object sender, EventArgs e)
         {
             limpiar();
             btnAgregar.Enabled = true;
-            txtProducto.Focus();
+            txtFecha.Focus();
         }
 
         private void dgvDetalle_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -148,7 +156,7 @@ namespace Sistema_de_Ventas
         {
             if (e.KeyCode == Keys.Enter) // Verifica si se presionó la tecla Enter
             {
-                txtPrecio.Focus(); // Pasa el foco al siguiente TextBox
+                txtCliente.Focus(); // Pasa el foco al siguiente TextBox
                 e.Handled = true; // Marca el evento como manejado
                 e.SuppressKeyPress = true; // Evita el sonido de "beep"
             }
@@ -158,7 +166,7 @@ namespace Sistema_de_Ventas
         {
             if (e.KeyCode == Keys.Enter) // Verifica si se presionó la tecla Enter
             {
-                txtCantidad.Focus(); // Pasa el foco al siguiente TextBox
+                txtTotal.Focus(); // Pasa el foco al siguiente TextBox
                 e.Handled = true; // Marca el evento como manejado
                 e.SuppressKeyPress = true; // Evita el sonido de "beep"
             }
@@ -177,25 +185,25 @@ namespace Sistema_de_Ventas
         private void dgvDetalle_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             posicion = dgvDetalle.CurrentRow.Index;
-            txtProducto.Text = dgvDetalle[1, posicion].Value.ToString();
-            txtPrecio.Text = dgvDetalle[2, posicion].Value.ToString();
-            txtCantidad.Text = dgvDetalle[3, posicion].Value.ToString();
+            txtFecha.Text = dgvDetalle[1, posicion].Value.ToString();
+            txtCliente.Text = dgvDetalle[2, posicion].Value.ToString();
+            txtTotal.Text = dgvDetalle[3, posicion].Value.ToString();
             btnAgregar.Enabled = false;
             btnModificar.Enabled = true;
             btnEliminar.Enabled = true;
-            txtProducto.Focus();
+            txtFecha.Focus();
         }
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             posicion = dgvDetalle.CurrentRow.Index;
-            txtProducto.Text = dgvDetalle[1, posicion].Value.ToString();
-            txtPrecio.Text = dgvDetalle[2, posicion].Value.ToString();
-            txtCantidad.Text = dgvDetalle[3, posicion].Value.ToString();
+            txtFecha.Text = dgvDetalle[1, posicion].Value.ToString();
+            txtCliente.Text = dgvDetalle[2, posicion].Value.ToString();
+            txtTotal.Text = dgvDetalle[3, posicion].Value.ToString();
             btnAgregar.Enabled = false;
             btnModificar.Enabled = true;
             btnEliminar.Enabled = true;
-            txtProducto.Focus();
+            txtFecha.Focus();
         }
 
         private void pictureBox6_Click(object sender, EventArgs e)
@@ -227,13 +235,13 @@ namespace Sistema_de_Ventas
                 if (filaSeleccionada.Cells[0].Value != null && filaSeleccionada.Cells[1].Value != null)
                 {
                     posicion = dgvDetalle.CurrentRow.Index;
-                    txtProducto.Text = dgvDetalle[1, posicion].Value.ToString();
-                    txtPrecio.Text = dgvDetalle[2, posicion].Value.ToString();
-                    txtCantidad.Text = dgvDetalle[3, posicion].Value.ToString();
+                    txtFecha.Text = dgvDetalle[1, posicion].Value.ToString();
+                    txtCliente.Text = dgvDetalle[2, posicion].Value.ToString();
+                    txtTotal.Text = dgvDetalle[3, posicion].Value.ToString();
                     btnAgregar.Enabled = false;
                     btnModificar.Enabled = true;
                     btnEliminar.Enabled = true;
-                    txtProducto.Focus();
+                    txtFecha.Focus();
                 }
                 else
                 {

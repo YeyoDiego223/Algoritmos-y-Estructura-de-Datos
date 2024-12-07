@@ -75,6 +75,10 @@ namespace Sistema_de_Ventas
                 Cajero formcajero = new Cajero();
                 formcajero.Show();
             }
+            else
+            {
+                MessageBox.Show("Contraseña Incorrecta");
+            }
         }
 
         private void txtContraseña_Enter(object sender, EventArgs e)

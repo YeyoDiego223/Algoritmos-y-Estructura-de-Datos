@@ -106,6 +106,7 @@ namespace Sistema_de_Ventas
             }
         }
 
+
         private void llenarDataGridView()
         {
         // Cadena de conexion
