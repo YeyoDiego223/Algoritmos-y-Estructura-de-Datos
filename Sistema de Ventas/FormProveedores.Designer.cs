@@ -371,6 +371,7 @@
             this.cbxNombre.Name = "cbxNombre";
             this.cbxNombre.Size = new System.Drawing.Size(323, 21);
             this.cbxNombre.TabIndex = 53;
+            this.cbxNombre.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbxNombre_KeyDown);
             // 
             // FormProveedores
             // 

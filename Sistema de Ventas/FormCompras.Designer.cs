@@ -323,6 +323,7 @@
             this.cbxProveedor.Name = "cbxProveedor";
             this.cbxProveedor.Size = new System.Drawing.Size(232, 21);
             this.cbxProveedor.TabIndex = 55;
+            this.cbxProveedor.Click += new System.EventHandler(this.cbxProveedor_Click);
             this.cbxProveedor.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbxProveedor_KeyDown);
             // 
             // FormCompras

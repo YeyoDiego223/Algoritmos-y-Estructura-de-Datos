@@ -21,18 +21,17 @@ namespace Sistema_de_Ventas
             cbxProveedor.DropDownStyle = ComboBoxStyle.DropDownList;
             llenarDataGridView();
             cbxProveedor.Focus();
-            llenarComboBox();
             limpiar();
 
-        }
-
+        }        
+        
         void eliminarbase()
         {
             posicion = dgvDetalle.CurrentRow.Index;
             var id = dgvDetalle[0, posicion].Value.ToString();
             // Conexión
             string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-            string query = @"DELETE FROM Productos WHERE ID_Producto = @idProducto";
+            string query = @"DELETE FROM Compras WHERE ID_Compra = @idCompra";
 
             // 1. Conexión y comando
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -41,13 +40,14 @@ namespace Sistema_de_Ventas
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     // 2. Parámetros para evitar SQL Injection
-                    cmd.Parameters.AddWithValue("@idProducto", id);
+                    cmd.Parameters.AddWithValue("@idCompra", id);
 
                     try
                     {
                         // 3. Abrír conexión y ejecutar comando
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Compra eliminada correctamente");
+                        dgvDetalle.Rows.RemoveAt(posicion);
                     }
                     catch (Exception ex)
                     {
@@ -112,6 +112,12 @@ namespace Sistema_de_Ventas
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("Compra actualizada correctamente");
+                            proveedor = cbxProveedor.Text;
+                            fecha = dtpFecha.Text;
+                            total = txtTotal.Text;
+                            dgvDetalle[1, posicion].Value = cbxProveedor.Text;
+                            dgvDetalle[2, posicion].Value = dtpFecha.Value.ToString("yyyy-MM-dd");
+                            dgvDetalle[3, posicion].Value = txtTotal.Text;
                         }
                         else
                         {
@@ -128,6 +134,77 @@ namespace Sistema_de_Ventas
                     conn.Close();
                 }
             }                       
+        }
+
+        void agregarbase()
+        {
+            proveedor = cbxProveedor.Text;
+            fecha = dtpFecha.Value.ToString("yyyy-MM-dd");
+            total = txtTotal.Text;
+            int idProveedor = 0; //Aquí se almacenara el ID_Proveedor obtenido
+            if (proveedor == "" || fecha == "" || total == "")
+            {
+                MessageBox.Show("No hay datos");
+            }
+            else
+            {
+                int lastID = 0;
+                if (dgvDetalle.Rows.Count > 0)
+                {
+                    // Obten el valor máximo de la columna "ID" (columna 0 en este caso)
+                    lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                            .Max(row => Convert.ToInt32(row.Cells[0].Value));
+                }
+                // Nuevo ID es el último ID + 1
+                int newID = lastID + 1;
+
+                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+                string queryObtenerID = "SELECT ID_Proveedor FROM Proveedores WHERE Nombre_Proveedor = @nombreProveedor";
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    try
+                    {
+                        // Obtener el ID_Proveedor
+                        using (SqlCommand cmdObtenerID = new SqlCommand(queryObtenerID, conn))
+                        {
+                            cmdObtenerID.Parameters.AddWithValue("@nombreProveedor", proveedor);
+                            conn.Open();
+                            object result = cmdObtenerID.ExecuteScalar(); // Ejecutar y obtener el resultado
+
+                            if (result != null)
+                            {
+                                idProveedor = Convert.ToInt32(result);
+                            }
+                            else
+                            {
+                                MessageBox.Show("El proveedor seleccionado no existe en la base de datos");
+                                return;
+                            }
+                        }
+                        string query = "INSERT INTO Compras (ID_Proveedor, Fecha_Compra, Total_Compra) " +
+                    "VALUES (@idProveedor, @fecha, @total)";
+                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@idProveedor", idProveedor);
+                            cmd.Parameters.AddWithValue("@fecha", fecha);
+                            cmd.Parameters.AddWithValue("@total", total);
+                            cmd.ExecuteNonQuery();
+                        }
+                        conn.Close();
+                        MessageBox.Show("Compra agregada.");
+                        dgvDetalle.Rows.Add(newID.ToString(), proveedor, fecha, total);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error al agregar compra {ex.Message}");
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
         }
 
         void llenarComboBox()
@@ -186,15 +263,21 @@ namespace Sistema_de_Ventas
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
+                        int lastID = 0;
+                        if (dgvDetalle.Rows.Count > 0)
+                        {
+                            lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                                    .Max(row => Convert.ToInt32(row.Cells["colCodigo"].Value));
+                        }
                         while (reader.Read())
                         {
+                            lastID++;
                             // Crear una nueva fila y asignar los valores manualmente
                             int rowIndex = dgvDetalle.Rows.Add();
                             dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = reader["ID_Compra"];
                             dgvDetalle.Rows[rowIndex].Cells["colProveedor"].Value = reader["Nombre_Proveedor"];
                             dgvDetalle.Rows[rowIndex].Cells["colFecha"].Value = reader["Fecha_Compra"];
                             dgvDetalle.Rows[rowIndex].Cells["colTotal"].Value = reader["Total_Compra"];
-                            i = i + 1;
                         }
                     }
                 }
@@ -213,7 +296,9 @@ namespace Sistema_de_Ventas
             cbxProveedor.Text = "";
             dtpFecha.Text = "";
             txtTotal.Text = "";
+            cbxProveedor.Items.Clear();
         }
+
         private void pictureBox4_Click(object sender, EventArgs e)
         {
             this.Hide();
@@ -251,69 +336,9 @@ namespace Sistema_de_Ventas
 
         private void button1_Click(object sender, EventArgs e)
         {
-            proveedor = cbxProveedor.Text;
-            fecha = dtpFecha.Value.ToString("yyyy-MM-dd");
-            total = txtTotal.Text;
-            int idProveedor = 0; //Aquí se almacenara el ID_Proveedor obtenido
-            if (proveedor == "" || fecha == "" || total == "")
-            {
-                MessageBox.Show("No hay datos");
-            }
-            else
-            {
-                dgvDetalle.Rows.Add(i + "", proveedor, fecha, total);
-                i = i + 1;
-                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-                string queryObtenerID = "SELECT ID_Proveedor FROM Proveedores WHERE Nombre_Proveedor = @nombreProveedor";
-                
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    try
-                    {
-                        // Obtener el ID_Proveedor
-                        using (SqlCommand cmdObtenerID = new SqlCommand(queryObtenerID, conn))
-                        {
-                            cmdObtenerID.Parameters.AddWithValue("@nombreProveedor", proveedor);
-                            conn.Open();
-                            object result = cmdObtenerID.ExecuteScalar(); // Ejecutar y obtener el resultado
-
-                            if (result != null)
-                            {
-                                idProveedor = Convert.ToInt32(result);
-                            }
-                            else
-                            {
-                                MessageBox.Show("El proveedor seleccionado no existe en la base de datos");
-                                return;
-                            }
-                        }
-                        string query = "INSERT INTO Compras (ID_Proveedor, Fecha_Compra, Total_Compra) " +
-                    "VALUES (@idProveedor, @fecha, @total)";
-                        using (SqlCommand cmd = new SqlCommand(query, conn))
-                        {
-                            cmd.Parameters.AddWithValue("@idProveedor", idProveedor);
-                            cmd.Parameters.AddWithValue("@fecha", fecha);
-                            cmd.Parameters.AddWithValue("@total", total);
-                            cmd.ExecuteNonQuery();
-                        }
-                        conn.Close();
-                        MessageBox.Show("Compra agregada.");
-
-                        }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error al agregar compra {ex.Message}");
-                    }
-                    finally
-                    {
-                        conn.Close();
-                    }
-                }
-                
-                limpiar();
-                cbxProveedor.Focus();
-                
-            }
+            agregarbase();
+            limpiar();
+            cbxProveedor.Focus();                            
         }
 
         private void btnSalir_Click(object sender, EventArgs e)
@@ -391,6 +416,8 @@ namespace Sistema_de_Ventas
 
         private void dgvDetalle_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
+            dgvDetalle.Columns[2].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvDetalle.Columns[3].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             if (dgvDetalle.Columns[e.ColumnIndex].Name == "colFecha")
             {
                 if (e.Value != null && e.Value != DBNull.Value)
@@ -410,25 +437,31 @@ namespace Sistema_de_Ventas
             }
         }
 
+        private void cbxProveedor_Click(object sender, EventArgs e)
+        {
+            llenarComboBox();
+        }
+
         private void btnEliminar_Click(object sender, EventArgs e)
         {
-            dgvDetalle.Rows.RemoveAt(posicion);
-            cbxProveedor.Focus();
-            eliminarbase();
+            DialogResult result = MessageBox.Show("¿Estas seguro que deseas eliminar esta compra?", "Confirmación", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                cbxProveedor.Focus();
+                eliminarbase();
+                limpiar();  
+            }            
         }
 
         private void btnModificar_Click(object sender, EventArgs e)
         {
-            proveedor = cbxProveedor.Text;
-            fecha = dtpFecha.Text;
-            total = txtTotal.Text;
-
-            dgvDetalle[1, posicion].Value = cbxProveedor.Text;
-            dgvDetalle[2, posicion].Value = dtpFecha.Value.ToString("yyyy-MM-dd");
-            dgvDetalle[3, posicion].Value = txtTotal.Text;
-            modificarbase();
-            limpiar();
-            cbxProveedor.Focus();
+            DialogResult result = MessageBox.Show("¿Estás seguro que quieres modificar esta compra?", "Confirmación", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {                
+                modificarbase();                
+                limpiar();
+                cbxProveedor.Focus();
+            }            
         }
     }
 }

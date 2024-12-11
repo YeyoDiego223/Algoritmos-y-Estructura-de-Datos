@@ -174,6 +174,7 @@ namespace Sistema_de_Ventas
 
         void limpiar()
         {
+            btnAgregar.Enabled = true;
             btnEliminar.Enabled = false;
             btnModificar.Enabled = false;
             cbxNombre.Text = "";
@@ -242,7 +243,15 @@ namespace Sistema_de_Ventas
 
         }
 
-
+        private void cbxNombre_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter) // Verifica si se presionó la tecla Enter
+            {
+                txtContacto.Focus(); // Pasa el foco al siguiente TextBox
+                e.Handled = true; // Marca el evento como manejado
+                e.SuppressKeyPress = true; // Evita el sonido de "beep"
+            }
+        }
 
         private void txtNombre_KeyDown(object sender, KeyEventArgs e)
         {
@@ -411,7 +420,7 @@ namespace Sistema_de_Ventas
                 cbxNombre.Focus();
             }
 
-        }
+        }        
 
         private void btnEliminar_Click(object sender, EventArgs e)
         {

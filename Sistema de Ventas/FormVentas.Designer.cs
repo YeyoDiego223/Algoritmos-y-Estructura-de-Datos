@@ -45,8 +45,6 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.txtCliente = new System.Windows.Forms.TextBox();
-            this.txtFecha = new System.Windows.Forms.TextBox();
             this.btnNuevo = new System.Windows.Forms.Button();
             this.btnModificar = new System.Windows.Forms.Button();
             this.btnEliminar = new System.Windows.Forms.Button();
@@ -56,6 +54,8 @@
             this.colFecha = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colCliente = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTotal = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dtpfecha = new System.Windows.Forms.DateTimePicker();
+            this.cbxCliente = new System.Windows.Forms.ComboBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnSalir)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -240,22 +240,6 @@
             this.label6.TabIndex = 40;
             this.label6.Text = "Cliente";
             // 
-            // txtCliente
-            // 
-            this.txtCliente.Location = new System.Drawing.Point(291, 122);
-            this.txtCliente.Name = "txtCliente";
-            this.txtCliente.Size = new System.Drawing.Size(136, 20);
-            this.txtCliente.TabIndex = 41;
-            this.txtCliente.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPrecio_KeyDown);
-            // 
-            // txtFecha
-            // 
-            this.txtFecha.Location = new System.Drawing.Point(288, 61);
-            this.txtFecha.Name = "txtFecha";
-            this.txtFecha.Size = new System.Drawing.Size(232, 20);
-            this.txtFecha.TabIndex = 42;
-            this.txtFecha.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtProducto_KeyDown);
-            // 
             // btnNuevo
             // 
             this.btnNuevo.Font = new System.Drawing.Font("ChunkFive", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -313,6 +297,8 @@
             this.dgvDetalle.Size = new System.Drawing.Size(646, 302);
             this.dgvDetalle.TabIndex = 55;
             this.dgvDetalle.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick_1);
+            this.dgvDetalle.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDetalle_CellContentClick_1);
+            this.dgvDetalle.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgvDetalle_CellFormatting);
             // 
             // colCodigo
             // 
@@ -334,18 +320,34 @@
             this.colTotal.HeaderText = "Total";
             this.colTotal.Name = "colTotal";
             // 
+            // dtpfecha
+            // 
+            this.dtpfecha.Location = new System.Drawing.Point(291, 62);
+            this.dtpfecha.Name = "dtpfecha";
+            this.dtpfecha.Size = new System.Drawing.Size(200, 20);
+            this.dtpfecha.TabIndex = 56;
+            // 
+            // cbxCliente
+            // 
+            this.cbxCliente.FormattingEnabled = true;
+            this.cbxCliente.Location = new System.Drawing.Point(291, 131);
+            this.cbxCliente.Name = "cbxCliente";
+            this.cbxCliente.Size = new System.Drawing.Size(121, 21);
+            this.cbxCliente.TabIndex = 57;
+            this.cbxCliente.Click += new System.EventHandler(this.cbxCliente_Click);
+            // 
             // FormVentas
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(944, 779);
+            this.Controls.Add(this.cbxCliente);
+            this.Controls.Add(this.dtpfecha);
             this.Controls.Add(this.dgvDetalle);
             this.Controls.Add(this.btnNuevo);
             this.Controls.Add(this.btnModificar);
             this.Controls.Add(this.btnEliminar);
             this.Controls.Add(this.btnAgregar);
-            this.Controls.Add(this.txtFecha);
-            this.Controls.Add(this.txtCliente);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.pictureBox9);
             this.Controls.Add(this.pictureBox8);
@@ -391,8 +393,6 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox txtCliente;
-        private System.Windows.Forms.TextBox txtFecha;
         private System.Windows.Forms.Button btnNuevo;
         private System.Windows.Forms.Button btnModificar;
         private System.Windows.Forms.Button btnEliminar;
@@ -403,5 +403,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colFecha;
         private System.Windows.Forms.DataGridViewTextBoxColumn colCliente;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTotal;
+        private System.Windows.Forms.DateTimePicker dtpfecha;
+        private System.Windows.Forms.ComboBox cbxCliente;
     }
 }

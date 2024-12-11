@@ -12,7 +12,7 @@ namespace Sistema_de_Ventas
 {
     public partial class FormProductos : Form
     {
-        int i = 1;
+        int i;
         int posicion;
         string producto, descripcion, precio, stock, categoria;
         public FormProductos()
@@ -98,6 +98,11 @@ namespace Sistema_de_Ventas
                     conn.Open();
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Producto actualizado correctamente.");
+                    dgvDetalle[1, posicion].Value = txtProducto.Text;
+                    dgvDetalle[2, posicion].Value = txtDescripcion.Text;
+                    dgvDetalle[3, posicion].Value = txtPrecio.Text;
+                    dgvDetalle[4, posicion].Value = txtStock.Text;
+                    dgvDetalle[5, posicion].Value = cbxCategoria.Text;
                 }
                 catch (Exception ex)
                 {
@@ -109,11 +114,11 @@ namespace Sistema_de_Ventas
 
         private void llenarDataGridView()
         {
-        // Cadena de conexion
-        string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+            // Cadena de conexion
+            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
 
-        // Consulta SQL
-        string query = "Select ID_Producto, Nombre_Producto, Descripcion, Precio, Stock, Categoria FROM Productos";
+            // Consulta SQL
+            string query = "SELECT ID_Producto, Nombre_Producto, Descripcion, Precio, Stock, Categoria FROM Productos";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -124,17 +129,29 @@ namespace Sistema_de_Ventas
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
+                        // Obtener el último ID en el DataGridView para asegurar la secuencia
+                        int lastID = 0;
+                        if (dgvDetalle.Rows.Count > 0)
+                        {
+                            // Recorrer las filas del DataGridView para obtener el valor máximo de ID
+                            lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                                    .Max(row => Convert.ToInt32(row.Cells["colCodigo"].Value));
+                        }
+
+                        // Recorrer los datos del reader y agregar las filas al DataGridView
                         while (reader.Read())
                         {
+                            // Nuevo ID es el último ID + 1
+                            lastID++;
+
                             // Crear una nueva fila y asignar los valores manualmente
                             int rowIndex = dgvDetalle.Rows.Add();
-                            dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = reader["ID_Producto"];
+                            dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = lastID;  // Usamos lastID
                             dgvDetalle.Rows[rowIndex].Cells["colNombre"].Value = reader["Nombre_Producto"];
                             dgvDetalle.Rows[rowIndex].Cells["colDescripcion"].Value = reader["Descripcion"];
                             dgvDetalle.Rows[rowIndex].Cells["colPrecio"].Value = reader["Precio"];
                             dgvDetalle.Rows[rowIndex].Cells["colStock"].Value = reader["Stock"];
                             dgvDetalle.Rows[rowIndex].Cells["colCategoria"].Value = reader["Categoria"];
-                            i = i + 1;
                         }
                     }
                 }
@@ -144,6 +161,7 @@ namespace Sistema_de_Ventas
                 }
             }
         }
+
 
         void limpiar()
         {
@@ -204,17 +222,31 @@ namespace Sistema_de_Ventas
             precio = txtPrecio.Text;
             stock = txtStock.Text;
             categoria = cbxCategoria.Text;
+
             if (producto == "" || descripcion == "" || precio == "" || stock == "" || categoria == "")
             {
                 MessageBox.Show("No hay datos");
             }
             else
             {
-                dgvDetalle.Rows.Add(i + "", producto, descripcion, precio, stock, categoria);
-                i = i + 1;
+                // Obtener el último valor de ID en el DataGridView
+                int lastID = 0;
+                if (dgvDetalle.Rows.Count > 0)
+                {
+                    // Obtén el valor máximo de la columna "ID" (columna 0 en este caso)
+                    lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                            .Max(row => Convert.ToInt32(row.Cells[0].Value));
+                }
+
+                // Nuevo ID es el último ID + 1
+                int newID = lastID + 1;
+
+                // Agregar el nuevo producto al DataGridView con el nuevo ID
+                
+
                 string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
                 string query = "INSERT INTO Productos (Nombre_Producto, Descripcion, Precio, Stock, Categoria) " +
-                       "VALUES (@nombre, @descripcion, @precio, @stock, @categoria)";
+                               "VALUES (@nombre, @descripcion, @precio, @stock, @categoria)";
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -226,22 +258,23 @@ namespace Sistema_de_Ventas
                     {
                         cmd.Parameters.AddWithValue("@stock", stock);
                         cmd.Parameters.AddWithValue("@categoria", categoria);
+                        dgvDetalle.Rows.Add(newID.ToString(), producto, descripcion, precio, stock, categoria);
                     }
                     else
                     {
                         MessageBox.Show("Precio o Stock no tienen un formato valido");
-                        return; //Detener la ejecucion
+                        return; // Detener la ejecución
                     }
-                    // Asignar valores a los parametros
+
+                    // Asignar valores a los parámetros
                     cmd.Parameters.AddWithValue("@nombre", producto);
                     cmd.Parameters.AddWithValue("@descripcion", descripcion);
                     cmd.Parameters.AddWithValue("@precio", precio);
-                    
 
                     // Ejecutar la consulta
                     try
                     {
-                        // 3. Abrír conexión y ejecutar comando
+                        // Abrir la conexión y ejecutar el comando
                         conn.Open();
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Producto agregado correctamente.");
@@ -251,10 +284,12 @@ namespace Sistema_de_Ventas
                         MessageBox.Show($"Error al agregar producto: {ex.Message}");
                     }
                 }
+
+                // Limpiar los campos de entrada y restablecer el foco
                 limpiar();
                 txtProducto.Focus();
             }
-        }
+    }
 
         private void cbxCategoria_KeyDown(object sender, KeyEventArgs e)
         {
@@ -325,21 +360,15 @@ namespace Sistema_de_Ventas
 
         private void btnModificar_Click(object sender, EventArgs e)
         {
-            producto = txtProducto.Text;
-            descripcion = txtDescripcion.Text;
-            precio = txtPrecio.Text;
-            stock = txtStock.Text;
-            categoria = cbxCategoria.Text;
-            
-            dgvDetalle[1, posicion].Value = txtProducto.Text;
-            dgvDetalle[2, posicion].Value = txtDescripcion.Text;
-            dgvDetalle[3, posicion].Value = txtPrecio.Text;
-            dgvDetalle[4, posicion].Value = txtStock.Text;
-            dgvDetalle[5, posicion].Value = cbxCategoria.Text;   
-            modificarbase();
-            limpiar();
-            txtProducto.Focus();
+            DialogResult result = MessageBox.Show("¿Estás seguro que deseas eliminar este producto?", "Confirmación", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                modificarbase();
+                limpiar();
+                txtProducto.Focus();
+            }            
         } 
+
         private void btnEliminar_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("¿Estas seguro que deseas eliminar este producto?",
