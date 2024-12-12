@@ -12,7 +12,6 @@ namespace Sistema_de_Ventas
 {
     public partial class FormClientes : Form
     {
-        int i = 1;
         int posicion;
         string nombre, apellido, email, tel, direcc;
         public FormClientes()
@@ -45,6 +44,7 @@ namespace Sistema_de_Ventas
 
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Cliente eliminado correctamente.");
+                        dgvDetalle.Rows.RemoveAt(posicion);
                     }
                     catch (Exception ex)
                     {
@@ -93,11 +93,64 @@ namespace Sistema_de_Ventas
                     conn.Open();
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Cliente actualizado correctamente.");
+                    dgvDetalle[1, posicion].Value = txtNombre.Text;
+                    dgvDetalle[2, posicion].Value = txtApellido.Text;
+                    dgvDetalle[3, posicion].Value = txtEmail.Text;
+                    dgvDetalle[4, posicion].Value = txtTelefono.Text;
+                    dgvDetalle[5, posicion].Value = txtDireccion.Text;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error al actualizar Cliente: {ex.Message}");
                 }
+            }
+        }
+
+        void agregarbase()
+        {
+            nombre = txtNombre.Text;
+            apellido = txtApellido.Text;
+            email = txtEmail.Text;
+            tel = txtTelefono.Text;
+            direcc = txtDireccion.Text;
+            if (nombre == "" || apellido == "" || email == "" || tel == "" || direcc == "")
+            {
+                MessageBox.Show("No hay datos");
+            }
+            else
+            {
+                int lastID = 0;
+                if (dgvDetalle.Rows.Count > 0)
+                {
+                    lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                        .Max(row => Convert.ToInt32(row.Cells[0].Value));
+                }
+                int newID = lastID + 1;
+                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+                string query = "INSERT INTO Clientes (Nombre, Apellido, Email, Telefono, Direccion) " +
+                       "VALUES (@nombre, @apellido, @email, @telefono, @direccion)";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@apellido", apellido);
+                    cmd.Parameters.AddWithValue("@email", email);
+                    cmd.Parameters.AddWithValue("@telefono", tel);
+                    cmd.Parameters.AddWithValue("@direccion", direcc);
+
+                    try
+                    {
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Clientes agregado.");
+                        dgvDetalle.Rows.Add(newID.ToString(), nombre, apellido, email, tel, direcc);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error al agregar cliente {ex.Message}");
+                    }
+                }
+
             }
         }
 
@@ -118,8 +171,15 @@ namespace Sistema_de_Ventas
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
+                        int lastID = 0;
+                        if (dgvDetalle.Rows.Count > 0)
+                        {
+                            lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                                    .Max(row => Convert.ToInt32(row.Cells["colCodigo"].Value));
+                        }
                         while (reader.Read())
                         {
+                            lastID++;
                             // Crear una nueva fila y asignar los valores manualmente
                             int rowIndex = dgvDetalle.Rows.Add();
                             dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = reader["ID_Cliente"];
@@ -128,7 +188,6 @@ namespace Sistema_de_Ventas
                             dgvDetalle.Rows[rowIndex].Cells["colEmail"].Value = reader["Email"];
                             dgvDetalle.Rows[rowIndex].Cells["colTelefono"].Value = reader["Telefono"];
                             dgvDetalle.Rows[rowIndex].Cells["colDireccion"].Value = reader["Direccion"];
-                            i = i + 1;
                         }
                     }
                 }
@@ -203,47 +262,9 @@ namespace Sistema_de_Ventas
 
         private void button1_Click(object sender, EventArgs e)
         {
-            nombre = txtNombre.Text;
-            apellido = txtApellido.Text;
-            email = txtEmail.Text;
-            tel = txtTelefono.Text;
-            direcc = txtDireccion.Text;
-            if (nombre == "" || apellido == "" || email == "" || tel == "" || direcc == "")
-            {
-                MessageBox.Show("No hay datos");
-            }
-            else
-            {
-                
-                dgvDetalle.Rows.Add(i + "", nombre, apellido, email, tel, direcc);
-                i = i + 1;
-                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-                string query = "INSERT INTO Clientes (Nombre, Apellido, Email, Telefono, Direccion) " +
-                       "VALUES (@nombre, @apellido, @email, @telefono, @direccion)";
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@nombre", nombre);
-                    cmd.Parameters.AddWithValue("@apellido", apellido);
-                    cmd.Parameters.AddWithValue("@email", email);
-                    cmd.Parameters.AddWithValue("@telefono", tel);
-                    cmd.Parameters.AddWithValue("@direccion", direcc);
-
-                    try
-                    {
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Clientes agregado.");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error al agregar cliente {ex.Message}");
-                    }
-                }
-                limpiar();
-                txtNombre.Focus();
-            }
-            
+            agregarbase();
+            limpiar();
+            txtNombre.Focus();
         }
 
         private void btnEliminar_Click(object sender, EventArgs e)
@@ -253,7 +274,6 @@ namespace Sistema_de_Ventas
             if (result == DialogResult.Yes)
             {
                 eliminarbase();
-                dgvDetalle.Rows.RemoveAt(posicion);
                 limpiar();
                 txtNombre.Focus();
             }
@@ -262,20 +282,13 @@ namespace Sistema_de_Ventas
 
         private void btnModificar_Click(object sender, EventArgs e)
         {
-            string nombre, apellido, email, tel, direcc;
-            nombre = txtNombre.Text;
-            apellido = txtApellido.Text;
-            email = txtEmail.Text;
-            tel = txtTelefono.Text;
-            direcc = txtDireccion.Text;
-            dgvDetalle[1, posicion].Value = txtNombre.Text;
-            dgvDetalle[2, posicion].Value = txtApellido.Text;
-            dgvDetalle[3, posicion].Value = txtEmail.Text;
-            dgvDetalle[4, posicion].Value = txtTelefono.Text;
-            dgvDetalle[5, posicion].Value = txtDireccion.Text;
-            modificarbase();
-            limpiar();
-            txtNombre.Focus();
+            DialogResult result = MessageBox.Show("¿Estas seguro de modificar este cliente?", "Confirmación", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                modificarbase();
+                limpiar();
+                txtNombre.Focus();
+            }            
         }
 
         private void btnNuevo_Click(object sender, EventArgs e)

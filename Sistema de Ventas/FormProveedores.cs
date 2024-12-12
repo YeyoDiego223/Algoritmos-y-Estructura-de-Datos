@@ -13,7 +13,7 @@ namespace Sistema_de_Ventas
     
     public partial class FormProveedores : Form
     {
-        int i = 1;
+        
         int posicion;
         string nombre, contacto, telefono, email;
         public FormProveedores()
@@ -44,9 +44,9 @@ namespace Sistema_de_Ventas
                     try
                     {
                         // 3. Abrir conexion y ejecutar comando
-
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Proveedor eliminado correctamente.");
+                        dgvDetalle.Rows.RemoveAt(posicion);
                     }
                     catch (Exception ex)
                     {
@@ -90,11 +90,66 @@ namespace Sistema_de_Ventas
                     conn.Open();
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Proveedor actualizado correctamente.");
+                    dgvDetalle[1, posicion].Value = cbxNombre.Text;
+                    dgvDetalle[2, posicion].Value = txtContacto.Text;
+                    dgvDetalle[3, posicion].Value = txtTelefono.Text;
+                    dgvDetalle[4, posicion].Value = txtEmail.Text;
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error al actualizar Proveedor: {ex.Message}");
                 }
+            }
+        }
+
+        void agregarbase()
+        {
+            nombre = cbxNombre.Text;
+            contacto = txtContacto.Text;
+            telefono = txtTelefono.Text;
+            email = txtEmail.Text;
+            if (nombre == "" || telefono == "" || email == "")
+            {
+                MessageBox.Show("No hay datos");
+            }
+            else
+            {
+                // Obtener el último valor de ID en el DataGridView
+                int lastID = 0;
+                if (dgvDetalle.Rows.Count > 0)
+                {
+                    // Obten el valor máximo de la columna "ID" (columna 0 en este caso)
+                    lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                            .Max(row => Convert.ToInt32(row.Cells[0].Value));
+                }
+                // Nuevo ID  es el último ID + 1
+                int newID = lastID + 1;
+                // Agregar el nuevo producto al DataGridView con el nuevo ID
+
+                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+                string query = "INSERT INTO Proveedores (Nombre_Proveedor, Contacto, Telefono, Email)" +
+                    "VALUES (@nombre, @contacto, @telefono, @email)";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@nombre", nombre);
+                    cmd.Parameters.AddWithValue("@contacto", contacto);
+                    cmd.Parameters.AddWithValue("@telefono", telefono);
+                    cmd.Parameters.AddWithValue("@email", email);
+
+                    try
+                    {
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Proveedor agregado.");
+                        dgvDetalle.Rows.Add(newID.ToString(), nombre, contacto, telefono, email);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error al agregar proveedor {ex.Message}");
+                    }
+                }
+
             }
         }
 
@@ -152,8 +207,15 @@ namespace Sistema_de_Ventas
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
+                        int lastID = 0;
+                        if (dgvDetalle.Rows.Count > 0)
+                        {
+                            lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                                    .Max(row => Convert.ToInt32(row.Cells["colCodigo"].Value));
+                        }
                         while (reader.Read())
                         {
+                            lastID++;
                             // Crear una nueva fila y asignar los valores manualmente
                             int rowIndex = dgvDetalle.Rows.Add();
                             dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = reader["ID_Proveedor"];
@@ -161,7 +223,6 @@ namespace Sistema_de_Ventas
                             dgvDetalle.Rows[rowIndex].Cells["colContacto"].Value = reader["Contacto"];
                             dgvDetalle.Rows[rowIndex].Cells["colTelefono"].Value = reader["Telefono"];
                             dgvDetalle.Rows[rowIndex].Cells["colEmail"].Value = reader["Email"];
-                            i = i + 1;
                         }
                     }
                 }
@@ -382,52 +443,20 @@ namespace Sistema_de_Ventas
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
-            nombre = cbxNombre.Text;
-            contacto = txtContacto.Text;
-            telefono = txtTelefono.Text;
-            email = txtEmail.Text;
-            if (nombre == "" || telefono == "" || email == "")
-            {
-                MessageBox.Show("No hay datos");
-            }
-            else
-            {
-                dgvDetalle.Rows.Add(i + "", nombre, contacto, telefono, email);
-                i = i + 1;
-                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-                string query = "INSERT INTO Proveedores (Nombre_Proveedor, Contacto, Telefono, Email)" +
-                    "VALUES (@nombre, @contacto, @telefono, @email)";
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@nombre", nombre);
-                    cmd.Parameters.AddWithValue("@contacto", contacto);
-                    cmd.Parameters.AddWithValue("@telefono", telefono);
-                    cmd.Parameters.AddWithValue("@email", email);
-
-                    try
-                    {
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Proveedor agregado.");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error al agregar proveedor {ex.Message}");
-                    }
-                }
-                limpiar();
-                cbxNombre.Focus();
-            }
-
+            agregarbase();
+            limpiar();
+            cbxNombre.Focus();
         }        
 
         private void btnEliminar_Click(object sender, EventArgs e)
         {
-            eliminarbase();
-            dgvDetalle.Rows.RemoveAt(posicion);
-            limpiar();
-            cbxNombre.Focus();
+            DialogResult result = MessageBox.Show("¿Estás seguro de eliminar este proveedor?", "Confirmación", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                eliminarbase();
+                limpiar();
+                cbxNombre.Focus();
+            }            
         }
 
         private void btnNuevo_Click(object sender, EventArgs e)
@@ -439,17 +468,13 @@ namespace Sistema_de_Ventas
 
         private void btnModificar_Click(object sender, EventArgs e)
         {
-            nombre = cbxNombre.Text;
-            contacto = txtContacto.Text;
-            telefono = txtTelefono.Text;
-            email = txtEmail.Text;
-            dgvDetalle[1, posicion].Value = cbxNombre.Text;
-            dgvDetalle[2, posicion].Value = txtContacto.Text;
-            dgvDetalle[3, posicion].Value = txtTelefono.Text;
-            dgvDetalle[4, posicion].Value = txtEmail.Text;
-            modificarbase();
-            limpiar();
-            cbxNombre.Focus();
+            DialogResult result = MessageBox.Show("¿Estás seguro que deseas modificar este proveedor", "Confirmacion", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                modificarbase();
+                limpiar();
+                cbxNombre.Focus();
+            }            
         }
     }
 }
