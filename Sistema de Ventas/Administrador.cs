@@ -14,6 +14,8 @@ namespace Sistema_de_Ventas
         public Administrador()
         {
             InitializeComponent();
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -21,6 +23,20 @@ namespace Sistema_de_Ventas
             this.Hide();
             Form1 Form1 = new Form1();
             Form1.Show();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            FormPrincipal principal = new FormPrincipal();
+            principal.Show();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Cambiar_Contraseñas cambiarcontra = new Cambiar_Contraseñas();
+            cambiarcontra.Show();
         }
     }
 }

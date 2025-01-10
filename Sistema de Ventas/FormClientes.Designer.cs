@@ -32,12 +32,12 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnSalir = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox7 = new System.Windows.Forms.PictureBox();
+            this.pctbxVentas = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.pictureBox4 = new System.Windows.Forms.PictureBox();
-            this.pictureBox6 = new System.Windows.Forms.PictureBox();
-            this.pictureBox5 = new System.Windows.Forms.PictureBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.pctbxProductos = new System.Windows.Forms.PictureBox();
+            this.pctbxDetalleVenta = new System.Windows.Forms.PictureBox();
+            this.pctbxCompras = new System.Windows.Forms.PictureBox();
+            this.pctbxProveedores = new System.Windows.Forms.PictureBox();
             this.pictureBox10 = new System.Windows.Forms.PictureBox();
             this.pictureBox9 = new System.Windows.Forms.PictureBox();
             this.txtEmail = new System.Windows.Forms.TextBox();
@@ -56,20 +56,20 @@
             this.btnModificar = new System.Windows.Forms.Button();
             this.btnEliminar = new System.Windows.Forms.Button();
             this.btnAgregar = new System.Windows.Forms.Button();
-            this.colCodigo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colNombre = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colApellido = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colEmail = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colTelefono = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDireccion = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colTelefono = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colEmail = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colApellido = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colNombre = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCodigo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnSalir)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxVentas)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxProductos)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxDetalleVenta)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxCompras)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxProveedores)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).BeginInit();
@@ -81,12 +81,12 @@
             this.panel1.BackColor = System.Drawing.SystemColors.AppWorkspace;
             this.panel1.Controls.Add(this.btnSalir);
             this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Controls.Add(this.pictureBox7);
+            this.panel1.Controls.Add(this.pctbxVentas);
             this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.pictureBox4);
-            this.panel1.Controls.Add(this.pictureBox6);
-            this.panel1.Controls.Add(this.pictureBox5);
-            this.panel1.Controls.Add(this.pictureBox3);
+            this.panel1.Controls.Add(this.pctbxProductos);
+            this.panel1.Controls.Add(this.pctbxDetalleVenta);
+            this.panel1.Controls.Add(this.pctbxCompras);
+            this.panel1.Controls.Add(this.pctbxProveedores);
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(269, 784);
@@ -114,16 +114,16 @@
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
-            // pictureBox7
+            // pctbxVentas
             // 
-            this.pictureBox7.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox7.Image")));
-            this.pictureBox7.Location = new System.Drawing.Point(12, 322);
-            this.pictureBox7.Name = "pictureBox7";
-            this.pictureBox7.Size = new System.Drawing.Size(242, 110);
-            this.pictureBox7.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox7.TabIndex = 7;
-            this.pictureBox7.TabStop = false;
-            this.pictureBox7.Click += new System.EventHandler(this.pictureBox7_Click);
+            this.pctbxVentas.Image = ((System.Drawing.Image)(resources.GetObject("pctbxVentas.Image")));
+            this.pctbxVentas.Location = new System.Drawing.Point(12, 322);
+            this.pctbxVentas.Name = "pctbxVentas";
+            this.pctbxVentas.Size = new System.Drawing.Size(242, 110);
+            this.pctbxVentas.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxVentas.TabIndex = 7;
+            this.pctbxVentas.TabStop = false;
+            this.pctbxVentas.Click += new System.EventHandler(this.pictureBox7_Click);
             // 
             // label1
             // 
@@ -136,49 +136,49 @@
             this.label1.Text = "CLIENTES";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
-            // pictureBox4
+            // pctbxProductos
             // 
-            this.pictureBox4.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox4.Image")));
-            this.pictureBox4.Location = new System.Drawing.Point(13, 87);
-            this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(242, 110);
-            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox4.TabIndex = 3;
-            this.pictureBox4.TabStop = false;
-            this.pictureBox4.Click += new System.EventHandler(this.pictureBox4_Click);
+            this.pctbxProductos.Image = ((System.Drawing.Image)(resources.GetObject("pctbxProductos.Image")));
+            this.pctbxProductos.Location = new System.Drawing.Point(13, 563);
+            this.pctbxProductos.Name = "pctbxProductos";
+            this.pctbxProductos.Size = new System.Drawing.Size(242, 110);
+            this.pctbxProductos.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxProductos.TabIndex = 5;
+            this.pctbxProductos.TabStop = false;
+            this.pctbxProductos.Click += new System.EventHandler(this.pictureBox6_Click);
             // 
-            // pictureBox6
+            // pctbxDetalleVenta
             // 
-            this.pictureBox6.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox6.Image")));
-            this.pictureBox6.Location = new System.Drawing.Point(13, 563);
-            this.pictureBox6.Name = "pictureBox6";
-            this.pictureBox6.Size = new System.Drawing.Size(242, 110);
-            this.pictureBox6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox6.TabIndex = 5;
-            this.pictureBox6.TabStop = false;
-            this.pictureBox6.Click += new System.EventHandler(this.pictureBox6_Click);
+            this.pctbxDetalleVenta.Image = ((System.Drawing.Image)(resources.GetObject("pctbxDetalleVenta.Image")));
+            this.pctbxDetalleVenta.Location = new System.Drawing.Point(13, 447);
+            this.pctbxDetalleVenta.Name = "pctbxDetalleVenta";
+            this.pctbxDetalleVenta.Size = new System.Drawing.Size(242, 110);
+            this.pctbxDetalleVenta.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxDetalleVenta.TabIndex = 4;
+            this.pctbxDetalleVenta.TabStop = false;
+            this.pctbxDetalleVenta.Click += new System.EventHandler(this.pictureBox5_Click);
             // 
-            // pictureBox5
+            // pctbxCompras
             // 
-            this.pictureBox5.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox5.Image")));
-            this.pictureBox5.Location = new System.Drawing.Point(13, 447);
-            this.pictureBox5.Name = "pictureBox5";
-            this.pictureBox5.Size = new System.Drawing.Size(242, 110);
-            this.pictureBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox5.TabIndex = 4;
-            this.pictureBox5.TabStop = false;
-            this.pictureBox5.Click += new System.EventHandler(this.pictureBox5_Click);
+            this.pctbxCompras.Image = ((System.Drawing.Image)(resources.GetObject("pctbxCompras.Image")));
+            this.pctbxCompras.Location = new System.Drawing.Point(12, 206);
+            this.pctbxCompras.Name = "pctbxCompras";
+            this.pctbxCompras.Size = new System.Drawing.Size(242, 110);
+            this.pctbxCompras.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxCompras.TabIndex = 2;
+            this.pctbxCompras.TabStop = false;
+            this.pctbxCompras.Click += new System.EventHandler(this.pictureBox3_Click);
             // 
-            // pictureBox3
+            // pctbxProveedores
             // 
-            this.pictureBox3.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3.Image")));
-            this.pictureBox3.Location = new System.Drawing.Point(12, 206);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(242, 110);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox3.TabIndex = 2;
-            this.pictureBox3.TabStop = false;
-            this.pictureBox3.Click += new System.EventHandler(this.pictureBox3_Click);
+            this.pctbxProveedores.Image = ((System.Drawing.Image)(resources.GetObject("pctbxProveedores.Image")));
+            this.pctbxProveedores.Location = new System.Drawing.Point(13, 87);
+            this.pctbxProveedores.Name = "pctbxProveedores";
+            this.pctbxProveedores.Size = new System.Drawing.Size(242, 110);
+            this.pctbxProveedores.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxProveedores.TabIndex = 3;
+            this.pctbxProveedores.TabStop = false;
+            this.pctbxProveedores.Click += new System.EventHandler(this.pictureBox4_Click);
             // 
             // pictureBox10
             // 
@@ -362,35 +362,35 @@
             this.btnAgregar.UseVisualStyleBackColor = true;
             this.btnAgregar.Click += new System.EventHandler(this.button1_Click);
             // 
-            // colCodigo
+            // colDireccion
             // 
-            this.colCodigo.HeaderText = "Codigo";
-            this.colCodigo.Name = "colCodigo";
-            // 
-            // colNombre
-            // 
-            this.colNombre.HeaderText = "Nombre";
-            this.colNombre.Name = "colNombre";
-            // 
-            // colApellido
-            // 
-            this.colApellido.HeaderText = "Apellido";
-            this.colApellido.Name = "colApellido";
-            // 
-            // colEmail
-            // 
-            this.colEmail.HeaderText = "Email";
-            this.colEmail.Name = "colEmail";
+            this.colDireccion.HeaderText = "Direccion";
+            this.colDireccion.Name = "colDireccion";
             // 
             // colTelefono
             // 
             this.colTelefono.HeaderText = "Telefono";
             this.colTelefono.Name = "colTelefono";
             // 
-            // colDireccion
+            // colEmail
             // 
-            this.colDireccion.HeaderText = "Direccion";
-            this.colDireccion.Name = "colDireccion";
+            this.colEmail.HeaderText = "Email";
+            this.colEmail.Name = "colEmail";
+            // 
+            // colApellido
+            // 
+            this.colApellido.HeaderText = "Apellido";
+            this.colApellido.Name = "colApellido";
+            // 
+            // colNombre
+            // 
+            this.colNombre.HeaderText = "Nombre";
+            this.colNombre.Name = "colNombre";
+            // 
+            // colCodigo
+            // 
+            this.colCodigo.HeaderText = "Codigo";
+            this.colCodigo.Name = "colCodigo";
             // 
             // FormClientes
             // 
@@ -416,17 +416,19 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.panel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormClientes";
-            this.Text = "FormClientes";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Clientes";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnSalir)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxVentas)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxProductos)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxDetalleVenta)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxCompras)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxProveedores)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).EndInit();
@@ -440,12 +442,12 @@
 
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.PictureBox pictureBox7;
+        private System.Windows.Forms.PictureBox pctbxVentas;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.PictureBox pictureBox6;
-        private System.Windows.Forms.PictureBox pictureBox5;
-        private System.Windows.Forms.PictureBox pictureBox4;
-        private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.PictureBox pctbxProductos;
+        private System.Windows.Forms.PictureBox pctbxDetalleVenta;
+        private System.Windows.Forms.PictureBox pctbxProveedores;
+        private System.Windows.Forms.PictureBox pctbxCompras;
         private System.Windows.Forms.PictureBox pictureBox10;
         private System.Windows.Forms.PictureBox pictureBox9;
         private System.Windows.Forms.TextBox txtEmail;

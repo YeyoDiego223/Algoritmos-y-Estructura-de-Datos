@@ -29,87 +29,87 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPrincipal));
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.pictureBox4 = new System.Windows.Forms.PictureBox();
-            this.pictureBox5 = new System.Windows.Forms.PictureBox();
-            this.pictureBox6 = new System.Windows.Forms.PictureBox();
+            this.pctbxProveedores = new System.Windows.Forms.PictureBox();
+            this.pctbxClientes = new System.Windows.Forms.PictureBox();
+            this.pctbxVentas = new System.Windows.Forms.PictureBox();
+            this.pctbxDetalleVenta = new System.Windows.Forms.PictureBox();
+            this.pctbxCompras = new System.Windows.Forms.PictureBox();
+            this.pctbxProductos = new System.Windows.Forms.PictureBox();
             this.pictureBox7 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxProveedores)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxClientes)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxVentas)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxDetalleVenta)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxCompras)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxProductos)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).BeginInit();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // pctbxProveedores
             // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(29, 22);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(182, 200);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
+            this.pctbxProveedores.Image = ((System.Drawing.Image)(resources.GetObject("pctbxProveedores.Image")));
+            this.pctbxProveedores.Location = new System.Drawing.Point(29, 22);
+            this.pctbxProveedores.Name = "pctbxProveedores";
+            this.pctbxProveedores.Size = new System.Drawing.Size(182, 200);
+            this.pctbxProveedores.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxProveedores.TabIndex = 0;
+            this.pctbxProveedores.TabStop = false;
+            this.pctbxProveedores.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
-            // pictureBox2
+            // pctbxClientes
             // 
-            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pictureBox2.Location = new System.Drawing.Point(251, 22);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(182, 200);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox2.TabIndex = 1;
-            this.pictureBox2.TabStop = false;
-            this.pictureBox2.Click += new System.EventHandler(this.pictureBox2_Click);
+            this.pctbxClientes.Image = ((System.Drawing.Image)(resources.GetObject("pctbxClientes.Image")));
+            this.pctbxClientes.Location = new System.Drawing.Point(251, 22);
+            this.pctbxClientes.Name = "pctbxClientes";
+            this.pctbxClientes.Size = new System.Drawing.Size(182, 200);
+            this.pctbxClientes.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxClientes.TabIndex = 1;
+            this.pctbxClientes.TabStop = false;
+            this.pctbxClientes.Click += new System.EventHandler(this.pictureBox2_Click);
             // 
-            // pictureBox3
+            // pctbxVentas
             // 
-            this.pictureBox3.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3.Image")));
-            this.pictureBox3.Location = new System.Drawing.Point(495, 22);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(182, 200);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox3.TabIndex = 2;
-            this.pictureBox3.TabStop = false;
-            this.pictureBox3.Click += new System.EventHandler(this.pictureBox3_Click);
+            this.pctbxVentas.Image = ((System.Drawing.Image)(resources.GetObject("pctbxVentas.Image")));
+            this.pctbxVentas.Location = new System.Drawing.Point(498, 22);
+            this.pctbxVentas.Name = "pctbxVentas";
+            this.pctbxVentas.Size = new System.Drawing.Size(182, 200);
+            this.pctbxVentas.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxVentas.TabIndex = 2;
+            this.pctbxVentas.TabStop = false;
+            this.pctbxVentas.Click += new System.EventHandler(this.pictureBox3_Click);
             // 
-            // pictureBox4
+            // pctbxDetalleVenta
             // 
-            this.pictureBox4.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox4.Image")));
-            this.pictureBox4.Location = new System.Drawing.Point(742, 22);
-            this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(182, 200);
-            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox4.TabIndex = 3;
-            this.pictureBox4.TabStop = false;
-            this.pictureBox4.Click += new System.EventHandler(this.pictureBox4_Click);
+            this.pctbxDetalleVenta.Image = ((System.Drawing.Image)(resources.GetObject("pctbxDetalleVenta.Image")));
+            this.pctbxDetalleVenta.Location = new System.Drawing.Point(742, 22);
+            this.pctbxDetalleVenta.Name = "pctbxDetalleVenta";
+            this.pctbxDetalleVenta.Size = new System.Drawing.Size(182, 200);
+            this.pctbxDetalleVenta.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxDetalleVenta.TabIndex = 3;
+            this.pctbxDetalleVenta.TabStop = false;
+            this.pctbxDetalleVenta.Click += new System.EventHandler(this.pictureBox4_Click);
             // 
-            // pictureBox5
+            // pctbxCompras
             // 
-            this.pictureBox5.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox5.Image")));
-            this.pictureBox5.Location = new System.Drawing.Point(108, 270);
-            this.pictureBox5.Name = "pictureBox5";
-            this.pictureBox5.Size = new System.Drawing.Size(182, 200);
-            this.pictureBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox5.TabIndex = 4;
-            this.pictureBox5.TabStop = false;
-            this.pictureBox5.Click += new System.EventHandler(this.pictureBox5_Click);
+            this.pctbxCompras.Image = ((System.Drawing.Image)(resources.GetObject("pctbxCompras.Image")));
+            this.pctbxCompras.Location = new System.Drawing.Point(108, 270);
+            this.pctbxCompras.Name = "pctbxCompras";
+            this.pctbxCompras.Size = new System.Drawing.Size(182, 200);
+            this.pctbxCompras.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxCompras.TabIndex = 4;
+            this.pctbxCompras.TabStop = false;
+            this.pctbxCompras.Click += new System.EventHandler(this.pictureBox5_Click);
             // 
-            // pictureBox6
+            // pctbxProductos
             // 
-            this.pictureBox6.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox6.Image")));
-            this.pictureBox6.Location = new System.Drawing.Point(352, 270);
-            this.pictureBox6.Name = "pictureBox6";
-            this.pictureBox6.Size = new System.Drawing.Size(182, 200);
-            this.pictureBox6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox6.TabIndex = 5;
-            this.pictureBox6.TabStop = false;
-            this.pictureBox6.Click += new System.EventHandler(this.pictureBox6_Click);
+            this.pctbxProductos.Image = ((System.Drawing.Image)(resources.GetObject("pctbxProductos.Image")));
+            this.pctbxProductos.Location = new System.Drawing.Point(352, 270);
+            this.pctbxProductos.Name = "pctbxProductos";
+            this.pctbxProductos.Size = new System.Drawing.Size(182, 200);
+            this.pctbxProductos.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pctbxProductos.TabIndex = 5;
+            this.pctbxProductos.TabStop = false;
+            this.pctbxProductos.Click += new System.EventHandler(this.pictureBox6_Click);
             // 
             // pictureBox7
             // 
@@ -128,20 +128,23 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(979, 545);
             this.Controls.Add(this.pictureBox7);
-            this.Controls.Add(this.pictureBox6);
-            this.Controls.Add(this.pictureBox5);
-            this.Controls.Add(this.pictureBox4);
-            this.Controls.Add(this.pictureBox3);
-            this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.pctbxProductos);
+            this.Controls.Add(this.pctbxCompras);
+            this.Controls.Add(this.pctbxDetalleVenta);
+            this.Controls.Add(this.pctbxVentas);
+            this.Controls.Add(this.pctbxClientes);
+            this.Controls.Add(this.pctbxProveedores);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormPrincipal";
-            this.Text = "FormPrincipal";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Menú";
+            this.Load += new System.EventHandler(this.FormPrincipal_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxProveedores)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxClientes)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxVentas)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxDetalleVenta)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxCompras)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pctbxProductos)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).EndInit();
             this.ResumeLayout(false);
 
@@ -149,12 +152,12 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.PictureBox pictureBox4;
-        private System.Windows.Forms.PictureBox pictureBox5;
-        private System.Windows.Forms.PictureBox pictureBox6;
+        private System.Windows.Forms.PictureBox pctbxProveedores;
+        private System.Windows.Forms.PictureBox pctbxClientes;
+        private System.Windows.Forms.PictureBox pctbxVentas;
+        private System.Windows.Forms.PictureBox pctbxDetalleVenta;
+        private System.Windows.Forms.PictureBox pctbxCompras;
+        private System.Windows.Forms.PictureBox pctbxProductos;
         private System.Windows.Forms.PictureBox pictureBox7;
     }
 }

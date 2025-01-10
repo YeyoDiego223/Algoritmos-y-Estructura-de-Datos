@@ -7,31 +7,198 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Data.SqlClient;
+using System.Drawing.Imaging;
 
 namespace Sistema_de_Ventas
 {
     public partial class FormProductos : Form
     {
-        int i;
-        int posicion;
-        string producto, descripcion, precio, stock, categoria;
+        int posicion, id, stock, precio;
+        string producto, descripcion, categoria, connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
         public FormProductos()
         {
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             InitializeComponent();
             txtProducto.Focus();
             llenarDataGridView();
             txtProducto.Focus();
             cbxCategoria.SelectedIndex = 0;
+            iniciosesion();
+            // Ajustar automáticamente el tamaño de las columnas para que se ajusten al contenido
+            dgvDetalle.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+
+            // Ajustar automáticamente el tamaño de la última columna rellenando el espacio restante
+            dgvDetalle.Columns[dgvDetalle.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
         }
 
+        void iniciosesion()
+        {
+            if (Form1.cargo == "Administrador")
+            {
+                pctbxVentas.Enabled = false;
+                pctbxVentas.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxVentas.png"));
+                pctbxDetalleVenta.Enabled = false;
+                pctbxDetalleVenta.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxDetalleVenta.png"));
+                pctbxCompras.Enabled = false;
+                pctbxCompras.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxCompras.png"));
+            }
+            else if (Form1.cargo == "Cajero")
+            {
+                pctbxClientes.Enabled = false;
+                pctbxClientes.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxClientes.png"));
+                pctbxDetalleVenta.Enabled = false;
+                pctbxDetalleVenta.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxDetalleVenta.png"));
+                pctbxCompras.Enabled = false;
+                pctbxCompras.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxCompras.png"));
+                pctbxProveedores.Enabled = false;
+                pctbxProveedores.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxProveedores.png"));                
+            }
+        }
 
+        private void agregarbase()
+        {
+            producto = txtProducto.Text;
+            descripcion = txtDescripcion.Text;
+            precio = Convert.ToInt32(txtPrecio.Text);
+            stock = Convert.ToInt32(txtStock.Text);
+            categoria = cbxCategoria.Text;
+            ;
+            if (producto == "" || descripcion == "" || string.IsNullOrWhiteSpace(txtPrecio.Text) || string.IsNullOrWhiteSpace(txtStock.Text) || categoria == "")
+            {
+                MessageBox.Show("No debe haber campos vacios", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }            
+
+            // Obtener el último valor de ID en el DataGridView
+            int lastID = 0;
+            if (dgvDetalle.Rows.Count > 0)
+            {
+                // Obtén el valor máximo de la columna "ID" (columna 0 en este caso)
+                lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                        .Max(row => Convert.ToInt32(row.Cells[0].Value));
+            }
+
+            // Nuevo ID es el último ID + 1
+            int newID = lastID + 1;
+
+            // Agregar el nuevo producto al DataGridView con el nuevo ID
+
+
+            string query = "INSERT INTO Productos (Nombre_Producto, Descripcion, Precio, Stock, Categoria) " +
+                           "VALUES (@nombre, @descripcion, @precio, @stock, @categoria)";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                
+
+                if (precio < 0 || stock < 0)
+                {                    
+                    cmd.Parameters.AddWithValue("@stock", stock);
+                    cmd.Parameters.AddWithValue("@categoria", categoria);
+                    dgvDetalle.Rows.Add(newID.ToString(), producto, descripcion, precio, stock, categoria);
+                }
+                else
+                {
+                    MessageBox.Show("Precio o Stock no tienen un formato valido", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return; // Detener la ejecución
+                }
+
+                // Asignar valores a los parámetros
+                cmd.Parameters.AddWithValue("@nombre", producto);
+                cmd.Parameters.AddWithValue("@descripcion", descripcion);
+                cmd.Parameters.AddWithValue("@precio", precio);
+
+                // Ejecutar la consulta
+                try
+                {
+                    // Abrir la conexión y ejecutar el comando
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Producto agregado correctamente.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al agregar producto: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            limpiar();
+            txtProducto.Focus();
+        }
+
+        private void modificarbase()
+        {
+            if (dgvDetalle.CurrentRow == null)
+            {
+                MessageBox.Show("Por favor, selecciona una fila antes de continuar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            int posicion = dgvDetalle.CurrentRow.Index;
+            id = Convert.ToInt32(dgvDetalle[0, posicion].Value); // ID como entero
+            producto = txtProducto.Text;
+            descripcion = txtDescripcion.Text;
+            decimal precio = Convert.ToDecimal(txtPrecio.Text); // Precio como decimal
+            if (!int.TryParse(txtStock.Text, out stock)) ; // Stock como entero
+            {
+                MessageBox.Show("El valor ingresado debe de ser entero.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            categoria = cbxCategoria.Text;
+
+
+            if (precio < 0 || stock < 0)
+            {
+                MessageBox.Show("Utiliza formato valido", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string query = @"
+            UPDATE Productos 
+            SET Nombre_Producto = @nombreProducto, 
+                Descripcion = @descripcion, 
+                Precio = @precio, 
+                Stock = @stock, 
+                Categoria = @categoria
+            WHERE ID_Producto = @idProducto";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                // Asignar parámetros con tipos correctos
+                cmd.Parameters.AddWithValue("@idProducto", id);
+                cmd.Parameters.AddWithValue("@nombreProducto", producto);
+                cmd.Parameters.AddWithValue("@descripcion", descripcion);
+                cmd.Parameters.AddWithValue("@precio", precio);
+                cmd.Parameters.AddWithValue("@stock", stock);
+                cmd.Parameters.AddWithValue("@categoria", categoria);
+
+                try
+                {
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Producto actualizado correctamente.");
+                    // Actualizar valores en el `DataGridView`
+                    dgvDetalle[1, posicion].Value = txtProducto.Text;
+                    dgvDetalle[2, posicion].Value = txtDescripcion.Text;
+                    dgvDetalle[3, posicion].Value = txtPrecio.Text;
+                    dgvDetalle[4, posicion].Value = txtStock.Text;
+                    dgvDetalle[5, posicion].Value = cbxCategoria.Text;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al actualizar producto: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            limpiar();
+            txtProducto.Focus();
+        }
 
         void eliminarbase()
         {
             posicion = dgvDetalle.CurrentRow.Index;
             var id = dgvDetalle[0, posicion].Value.ToString();
                 // Conexion
-                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
                 string query = @"DELETE FROM Productos WHERE ID_Producto = @idProducto";
 
                 // 1. Conexion y comando
@@ -52,7 +219,7 @@ namespace Sistema_de_Ventas
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"Error al eliminar producto: {ex.Message}");
+                            MessageBox.Show($"Error al eliminar producto: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     
                 }
@@ -60,62 +227,45 @@ namespace Sistema_de_Ventas
             }        
          }
 
-        void modificarbase()
+        private Image ConvertToGrayscale(Image originalImage)
         {
-            posicion = dgvDetalle.CurrentRow.Index;
-            var id = dgvDetalle[0, posicion].Value.ToString();
-            var producto = dgvDetalle[1, posicion].Value.ToString();
-            var descripcion = dgvDetalle[2, posicion].Value.ToString();
-            var precio = dgvDetalle[3, posicion].Value.ToString();
-            var stock = dgvDetalle[4, posicion].Value.ToString();
-            var categoria = dgvDetalle[5, posicion].Value.ToString();
-            // Conexión
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-            string query = @"
-        UPDATE Productos 
-        SET Nombre_Producto = @nombreProducto, 
-            Descripcion = @descripcion, 
-            Precio = @precio, 
-            Stock = @stock, 
-            Categoria = @categoria
-        WHERE ID_Producto = @idProducto";
+            // Crear un nuevo Bitmap con las mismas dimensiones que la imagen original
+            Bitmap grayscaleImage = new Bitmap(originalImage.Width, originalImage.Height);
 
-            // 1. Conexión y comando
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, conn))
+            // Crear gráficos desde el Bitmap
+            using (Graphics g = Graphics.FromImage(grayscaleImage))
             {
-                // 2. Parámetros para evitar SQL Injection
-                cmd.Parameters.AddWithValue("@idProducto", id);
-                cmd.Parameters.AddWithValue("@nombreProducto", producto);
-                cmd.Parameters.AddWithValue("@descripcion", descripcion);
-                cmd.Parameters.AddWithValue("@precio", precio);
-                cmd.Parameters.AddWithValue("@stock", stock);
-                cmd.Parameters.AddWithValue("@categoria", categoria);
+                // Crear un conjunto de atributos de imagen
+                ImageAttributes attributes = new ImageAttributes();
 
-                try
-                {
-                    // 3. Abrír conexión y ejecutar comando
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Producto actualizado correctamente.");
-                    dgvDetalle[1, posicion].Value = txtProducto.Text;
-                    dgvDetalle[2, posicion].Value = txtDescripcion.Text;
-                    dgvDetalle[3, posicion].Value = txtPrecio.Text;
-                    dgvDetalle[4, posicion].Value = txtStock.Text;
-                    dgvDetalle[5, posicion].Value = cbxCategoria.Text;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error al actualizar producto: {ex.Message}");
-                }
+                // Crear una matriz de escala de grises
+                float[][] colorMatrixElements = {
+            new float[] { 0.3f, 0.3f, 0.3f, 0, 0 },
+            new float[] { 0.59f, 0.59f, 0.59f, 0, 0 },
+            new float[] { 0.11f, 0.11f, 0.11f, 0, 0 },
+            new float[] { 0, 0, 0, 1, 0 },
+            new float[] { 0, 0, 0, 0, 1 }
+        };
+
+                // Crear la matriz de color
+                ColorMatrix colorMatrix = new ColorMatrix(colorMatrixElements);
+
+                // Establecer la matriz de color en los atributos
+                attributes.SetColorMatrix(colorMatrix);
+
+                // Dibujar la imagen original en escala de grises
+                g.DrawImage(originalImage,
+                    new Rectangle(0, 0, originalImage.Width, originalImage.Height),
+                    0, 0, originalImage.Width, originalImage.Height,
+                    GraphicsUnit.Pixel, attributes);
             }
-        }
 
+            return grayscaleImage;
+        }
 
         private void llenarDataGridView()
         {
             // Cadena de conexion
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
 
             // Consulta SQL
             string query = "SELECT ID_Producto, Nombre_Producto, Descripcion, Precio, Stock, Categoria FROM Productos";
@@ -157,11 +307,10 @@ namespace Sistema_de_Ventas
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}");
+                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
-
 
         void limpiar()
         {
@@ -183,8 +332,8 @@ namespace Sistema_de_Ventas
         private void pictureBox3_Click(object sender, EventArgs e)
         {
             this.Hide();
-            FormCompras compras = new FormCompras();
-            compras.Show();
+            FormClientes clientes = new FormClientes();
+            clientes.Show();
         }
 
         private void pictureBox4_Click(object sender, EventArgs e)
@@ -204,7 +353,7 @@ namespace Sistema_de_Ventas
         private void pictureBox6_Click(object sender, EventArgs e)
         {
             this.Hide();
-            FormDetalles detalles = new FormDetalles();
+            frmEstadisticas detalles = new frmEstadisticas();
             detalles.Show();
         }
 
@@ -217,79 +366,8 @@ namespace Sistema_de_Ventas
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
-            producto = txtProducto.Text;
-            descripcion = txtDescripcion.Text;
-            precio = txtPrecio.Text;
-            stock = txtStock.Text;
-            categoria = cbxCategoria.Text;
-
-            if (producto == "" || descripcion == "" || precio == "" || stock == "" || categoria == "")
-            {
-                MessageBox.Show("No hay datos");
-            }
-            else
-            {
-                // Obtener el último valor de ID en el DataGridView
-                int lastID = 0;
-                if (dgvDetalle.Rows.Count > 0)
-                {
-                    // Obtén el valor máximo de la columna "ID" (columna 0 en este caso)
-                    lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
-                                            .Max(row => Convert.ToInt32(row.Cells[0].Value));
-                }
-
-                // Nuevo ID es el último ID + 1
-                int newID = lastID + 1;
-
-                // Agregar el nuevo producto al DataGridView con el nuevo ID
-                
-
-                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-                string query = "INSERT INTO Productos (Nombre_Producto, Descripcion, Precio, Stock, Categoria) " +
-                               "VALUES (@nombre, @descripcion, @precio, @stock, @categoria)";
-
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    decimal precioDecimal;
-                    int stockInt;
-
-                    if (decimal.TryParse(precio, out precioDecimal) && int.TryParse(stock, out stockInt))
-                    {
-                        cmd.Parameters.AddWithValue("@stock", stock);
-                        cmd.Parameters.AddWithValue("@categoria", categoria);
-                        dgvDetalle.Rows.Add(newID.ToString(), producto, descripcion, precio, stock, categoria);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Precio o Stock no tienen un formato valido");
-                        return; // Detener la ejecución
-                    }
-
-                    // Asignar valores a los parámetros
-                    cmd.Parameters.AddWithValue("@nombre", producto);
-                    cmd.Parameters.AddWithValue("@descripcion", descripcion);
-                    cmd.Parameters.AddWithValue("@precio", precio);
-
-                    // Ejecutar la consulta
-                    try
-                    {
-                        // Abrir la conexión y ejecutar el comando
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Producto agregado correctamente.");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error al agregar producto: {ex.Message}");
-                    }
-                }
-
-                // Limpiar los campos de entrada y restablecer el foco
-                limpiar();
-                txtProducto.Focus();
-            }
-    }
+            agregarbase();            
+        }
 
         private void cbxCategoria_KeyDown(object sender, KeyEventArgs e)
         {
@@ -346,6 +424,11 @@ namespace Sistema_de_Ventas
 
         }
 
+        private void cbxCategoria_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
         private void dgvDetalle_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             dgvDetalle.Columns[3].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
@@ -358,14 +441,19 @@ namespace Sistema_de_Ventas
             }
         }
 
+        private void pictureBox7_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            FormCompras compras = new FormCompras();
+            compras.Show();
+        }
+
         private void btnModificar_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show("¿Estás seguro que deseas eliminar este producto?", "Confirmación", MessageBoxButtons.YesNo);
+            DialogResult result = MessageBox.Show("¿Estás seguro que deseas modificar este producto?", "Confirmación", MessageBoxButtons.YesNo);
             if (result == DialogResult.Yes)
             {
-                modificarbase();
-                limpiar();
-                txtProducto.Focus();
+                modificarbase();                
             }            
         } 
 
@@ -407,10 +495,11 @@ namespace Sistema_de_Ventas
                     btnModificar.Enabled = true;
                     btnEliminar.Enabled = true;
                     txtProducto.Focus();
+                    
                 }
                 else
                 {
-                    MessageBox.Show("La fila seleccionada contiene celdas vacias.");
+                    MessageBox.Show("La fila seleccionada contiene celdas vacias.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }

@@ -14,6 +14,7 @@ namespace Sistema_de_Ventas
         public Cajero()
         {
             InitializeComponent();
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -21,6 +22,18 @@ namespace Sistema_de_Ventas
             this.Hide();
             Form1 Form1 = new Form1();
             Form1.Show();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            FormPrincipal principal = new FormPrincipal();
+            principal.Show();
+        }
+
+        private void Cajero_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

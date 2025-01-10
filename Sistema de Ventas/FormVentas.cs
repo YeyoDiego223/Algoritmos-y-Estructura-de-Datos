@@ -7,76 +7,173 @@ using System.Linq;
 using System.Text;
 using System.Data.SqlClient;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
+using System.Text.RegularExpressions;
 
 namespace Sistema_de_Ventas
 {
 
     public partial class FormVentas : Form
     {
-        string fecha, cliente, total;
-        int posicion;
-        int i = 1;
+        string numeroPattern = @"^[1-9]\d*$", connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+        string fecha, cliente, producto;
+        double precio,  cantidad, total, cantidadAnterior, diferencia, nuevoStock;
+        int posicion, idVenta = 0, idProducto = 0, stockProducto, idCliente = 0, lastID = 0, newID;
         public FormVentas()
         {
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             InitializeComponent();
-            llenarDataGridView();
             dtpfecha.Focus();
             limpiar();
+            cbxCliente.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbxProducto.DropDownStyle = ComboBoxStyle.DropDownList;
+            txtTotal.ReadOnly = true;
+            txtPrecio.ReadOnly = true;
+            lblExistencia.Text = "";
+            iniciosesion();
+            llenarDataGridView();
+            // Ajustar automáticamente el tamaño de las columnas para que se ajusten al contenido
+            dgvDetalle.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+            // Ajustar automáticamente el tamaño de la última columna rellenando el espacio restante
+            dgvDetalle.Columns[dgvDetalle.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        }
+
+        void iniciosesion()
+        {
+            if (Form1.cargo == "Administrador")
+            {                
+                pctbxDetalleVenta.Enabled = false;
+                pctbxDetalleVenta.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxDetalleVenta.png"));
+                pctbxCompras.Enabled = false;
+                pctbxCompras.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxCompras.png"));
+            }
+            else if (Form1.cargo == "Cajero")
+            {
+                pctbxClientes.Enabled = false;
+                pctbxClientes.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxClientes.png"));
+                pctbxDetalleVenta.Enabled = false;
+                pctbxDetalleVenta.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxDetalleVenta.png"));
+                pctbxCompras.Enabled = false;
+                pctbxCompras.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxCompras.png"));
+                pctbxProveedores.Enabled = false;
+                pctbxProveedores.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxProveedores.png"));
+                pctbxProductos.Enabled = false;
+                pctbxProductos.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxProductos.png"));
+            }
+        }
+
+        private Image ConvertToGrayscale(Image originalImage)
+        {
+            // Crear un nuevo Bitmap con las mismas dimensiones que la imagen original
+            Bitmap grayscaleImage = new Bitmap(originalImage.Width, originalImage.Height);
+
+            // Crear gráficos desde el Bitmap
+            using (Graphics g = Graphics.FromImage(grayscaleImage))
+            {
+                // Crear un conjunto de atributos de imagen
+                ImageAttributes attributes = new ImageAttributes();
+
+                // Crear una matriz de escala de grises
+                float[][] colorMatrixElements = {
+            new float[] { 0.3f, 0.3f, 0.3f, 0, 0 },
+            new float[] { 0.59f, 0.59f, 0.59f, 0, 0 },
+            new float[] { 0.11f, 0.11f, 0.11f, 0, 0 },
+            new float[] { 0, 0, 0, 1, 0 },
+            new float[] { 0, 0, 0, 0, 1 }
+        };
+
+                // Crear la matriz de color
+                ColorMatrix colorMatrix = new ColorMatrix(colorMatrixElements);
+
+                // Establecer la matriz de color en los atributos
+                attributes.SetColorMatrix(colorMatrix);
+
+                // Dibujar la imagen original en escala de grises
+                g.DrawImage(originalImage,
+                    new Rectangle(0, 0, originalImage.Width, originalImage.Height),
+                    0, 0, originalImage.Width, originalImage.Height,
+                    GraphicsUnit.Pixel, attributes);
+            }
+
+            return grayscaleImage;
         }
 
         void eliminarbase()
         {
-            fecha = dtpfecha.Value.ToString("yyyy-MM-dd");
+            idVenta = Convert.ToInt32(dgvDetalle[0, posicion].Value);           
             // Conexión
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-            string query = @"DELETE FROM Ventas WHERE Fecha_Venta = @fechaventa";
+            string queryEliminarVenta = "DELETE FROM Ventas WHERE ID_Venta = @idVenta";
+            string queryEliminarDetalle = "DELETE FROM Detalles_Venta WHERE ID_Venta = @idVenta";
 
-            // 1. Conexión y comando
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    // 2. Parámetros para evitar SQL Injection
-                    cmd.Parameters.AddWithValue("@fechaventa", fecha);
+                    conn.Open();
+                    // Primero eliminar los registro relacionados en Detalles_Venta
+                    using (SqlCommand cmdDetalle = new SqlCommand(queryEliminarDetalle, conn))
+                    {
+                        // 2. Parámetros para evitar SQL Injection
+                        cmdDetalle.Parameters.AddWithValue("@idVenta", idVenta);
+                        cmdDetalle.ExecuteNonQuery();                       
+                    }
+                    // Luego eliminar el registro en Ventas
+                    using (SqlCommand cmdVenta = new SqlCommand(queryEliminarVenta, conn))
+                    {
+                        cmdVenta.Parameters.AddWithValue("@idVenta", idVenta);
+                        cmdVenta.ExecuteNonQuery();
+                    }
 
-                    try
-                    {
-                        // 3. Abrír conexión y ejecutar comando
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Venta eliminada correctamente");
-                        dgvDetalle.Rows.RemoveAt(posicion);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error al eliminar venta: {ex.Message}");
-                    }
+                    MessageBox.Show("Venta eliminada correctamente.");
+                    dgvDetalle.Rows.RemoveAt(posicion);
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al eliminar la venta: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }   
         }
 
         void modificarbase()
         {
             posicion = dgvDetalle.CurrentRow.Index;
-            var idVenta = dgvDetalle[0, posicion].Value.ToString();
+            idVenta = Convert.ToInt32(dgvDetalle[0, posicion].Value.ToString());
             fecha = dtpfecha.Value.ToString("yyyy-MM-dd");
-            cliente = dgvDetalle[2, posicion].Value.ToString();
-            total = dgvDetalle[3, posicion].Value.ToString();
-            int idCliente = 0;
+            cliente = cbxCliente.Text;
+            producto = cbxProducto.Text;
+            // Restricción de campo vacío de cantidad
+            if (string.IsNullOrWhiteSpace(txtCantidad.Text))
+            {
+                MessageBox.Show("Cantidad no debe estar vacío", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCantidad.Text = "";
+                return;
+            }
+            cantidad = Convert.ToDouble(txtCantidad.Text);
+            precio = Convert.ToDouble(txtPrecio.Text);
+            total = Convert.ToDouble(txtTotal.Text);
+            // Rstriccion campos vacíos
+            if (fecha == "" || cliente == "" || producto == "" || string.IsNullOrWhiteSpace(txtCantidad.Text) || string.IsNullOrWhiteSpace(txtPrecio.Text) || string.IsNullOrWhiteSpace(txtTotal.Text))
+            {
+                MessageBox.Show("No debe haber campos vacios", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-            string queryObtenerID = "SELECT ID_Cliente FROM Clientes WHERE Nombre = @nombreCliente";
+            string queryObtenerIDCliente = "SELECT ID_Cliente FROM Clientes WHERE Nombre = @nombreCliente";
+            string queryObtenerIDProducto = "SELECT ID_Producto, Stock FROM Productos WHERE Nombre_Producto = @nombreProducto";
+            string queryActualizarVenta = "UPDATE Ventas SET Fecha_Venta = @fechaventa, ID_Cliente = @idCliente, Total_Venta = @totalventa WHERE ID_Venta = @idVenta";
+            string queryActualizarDetalleVenta = "UPDATE Detalles_Venta SET ID_Venta = @idVenta, ID_Producto = @idProducto, Cantidad = @cantidad, Precio = @precio WHERE ID_Venta = @idVenta";
+            string queryActualizarStockProducto = "UPDATE Productos SET Stock = @nuevoStock WHERE ID_Producto = @idProducto";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 try
                 {
+                    conn.Open();
                     // Obtener el ID_Cliente
-                    using (SqlCommand cmdObtenerID = new SqlCommand(queryObtenerID, conn))
+                    using (SqlCommand cmdObtenerIDCliente = new SqlCommand(queryObtenerIDCliente, conn))
                     {
-                        cmdObtenerID.Parameters.AddWithValue("@nombreCliente", cliente);
-                        conn.Open();
-                        object result = cmdObtenerID.ExecuteScalar(); // Ejecutar y obtener el resultado
+                        cmdObtenerIDCliente.Parameters.AddWithValue("@nombreCliente", cliente);
+                        object result = cmdObtenerIDCliente.ExecuteScalar(); // Ejecutar y obtener el resultado
 
                         if (result != null)
                         {
@@ -84,140 +181,372 @@ namespace Sistema_de_Ventas
                         }
                         else
                         {
-                            MessageBox.Show("El cliente seleccionado no existe en la base de datos");
+                            MessageBox.Show("El cliente seleccionado no existe en la base de datos", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
                     }
 
-                    // Consulta para actualizar la venta
+                    // Obtener ID Producto
 
-                    string queryActualizarCompra = @"
-                        UPDATE Ventas
-                        SET Fecha_Venta = @fechaventa,
-                            ID_Cliente = @idCliente,
-                            Total_Venta = @totalventa
-                        WHERE ID_Venta = @idVenta";
+                    using (SqlCommand cmdObtenerIDProducto = new SqlCommand(queryObtenerIDProducto, conn))
+                    {
+                        cmdObtenerIDProducto.Parameters.AddWithValue("@nombreProducto", producto);
+                        SqlDataReader reader = cmdObtenerIDProducto.ExecuteReader();
 
-                    using (SqlCommand cmdActualizarVenta = new SqlCommand(queryActualizarCompra, conn))
+                        if (reader.Read())
+                        {
+                            idProducto = Convert.ToInt32(reader["ID_Producto"]);
+                            stockProducto = Convert.ToInt32(reader["Stock"]);
+                        }
+                        else
+                        {
+                            MessageBox.Show("El producto seleccionado no existe en la base de datos", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        reader.Close(); // Cerrar el DataReader
+                    }
+
+                    // Obtener la cantidad vendida anterior agregada al producto (si existe)
+                    cantidadAnterior = Convert.ToDouble(dgvDetalle[4, posicion].Value.ToString());
+                    // Calcular la diferencia entre la cantidad actual y la anterior
+                    diferencia = stockProducto + cantidadAnterior;
+                    nuevoStock = diferencia - cantidad;
+                    // Actualizar el stock del producto en la tabla Productos
+                    using (SqlCommand cmdActualizarStock = new SqlCommand(queryActualizarStockProducto, conn))
+                    {
+                        cmdActualizarStock.Parameters.AddWithValue("@nuevoStock", nuevoStock);
+                        cmdActualizarStock.Parameters.AddWithValue("@idProducto", idProducto);
+                        cmdActualizarStock.ExecuteNonQuery();
+                    }
+
+                    // Actualizar tabla Venta
+
+                    using (SqlCommand cmdActualizarVenta = new SqlCommand(queryActualizarVenta, conn))
                     {
                         cmdActualizarVenta.Parameters.AddWithValue("@idVenta", idVenta);
                         cmdActualizarVenta.Parameters.AddWithValue("@fechaventa", fecha);
                         cmdActualizarVenta.Parameters.AddWithValue("@idCliente", idCliente);
                         cmdActualizarVenta.Parameters.AddWithValue("@totalventa", total);
+                    }
+
+                    // Actualizar tabla DetalleVenta
+                    using (SqlCommand cmdActualizarDetalleVenta = new SqlCommand(queryActualizarDetalleVenta, conn))
+                    {
+                        cmdActualizarDetalleVenta.Parameters.AddWithValue("@idVenta", idVenta);
+                        cmdActualizarDetalleVenta.Parameters.AddWithValue("@idProducto", idProducto);
+                        cmdActualizarDetalleVenta.Parameters.AddWithValue("@cantidad", cantidad);
+                        cmdActualizarDetalleVenta.Parameters.AddWithValue("@precio", precio);
 
                         // Ejecutar la consulta de actualización
-                        int rowsAffected = cmdActualizarVenta.ExecuteNonQuery();
+                        int rowsAffected = cmdActualizarDetalleVenta.ExecuteNonQuery();
 
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("Venta actualizada correctamente");
                             dgvDetalle[1, posicion].Value = dtpfecha.Text;
                             dgvDetalle[2, posicion].Value = cbxCliente.Text;
-                            dgvDetalle[3, posicion].Value = txtTotal.Text;
+                            dgvDetalle[3, posicion].Value = cbxProducto.Text;
+                            dgvDetalle[4, posicion].Value = txtCantidad.Text;
+                            dgvDetalle[5, posicion].Value = txtPrecio.Text;
+                            dgvDetalle[6, posicion].Value = txtTotal.Text;
                             var colCodigo = dgvDetalle[0, posicion].Value.ToString();
                         }
                         else
                         {
-                            MessageBox.Show("No se encontró el registro de venta a modificar");
+                            MessageBox.Show("No se encontró el registro de venta a modificar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 }
+
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al actualizar compra: {ex.Message}");
+                    MessageBox.Show($"Error al actualizar compra: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
                     conn.Close();
                 }
             }
+            limpiar();
+            cbxCliente.Focus();
         }
 
         void agregarbase()
         {
             fecha = dtpfecha.Value.ToString("yyyy-MM-dd");
             cliente = cbxCliente.Text;
-            total = txtTotal.Text;
-            int idCliente = 0;
+            producto = cbxProducto.Text;
+            total = Convert.ToDouble(txtTotal.Text);
+            double.TryParse(txtPrecio.Text, out precio);
+            double.TryParse(txtCantidad.Text, out cantidad);
+            
 
-            if (fecha == "" || cliente == "" || total == "")
+            if (fecha == "" || cliente == "" || producto == "")
             {
-                MessageBox.Show("No hay datos");
+                MessageBox.Show("No debe dejar campos vacíos", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
-            else
+
+            if (string.IsNullOrWhiteSpace(txtCantidad.Text))
             {
-                // Obtener el último valor de ID en el DataGridView
-                int lastID = 0;
-                if (dgvDetalle.Rows.Count > 0)
+                MessageBox.Show("Cantidad no debe estar vacío", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCantidad.Text = "";
+                txtCantidad.Focus();
+                return;
+            }
+
+            // Verificar y convertir el contenido a txtPrecio
+            if (!double.TryParse(txtPrecio.Text, out precio))
+            {
+                MessageBox.Show("El precio debe ser un número valido.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }           
+
+            string queryObtenerIDProducto = "SELECT ID_Producto, Stock FROM Productos WHERE Nombre_Producto = @nombreProducto";
+            string queryObtenerIDVenta = "SELECT ID_Venta FROM Ventas WHERE Fecha_Venta = @fecha AND ID_Cliente = @idCliente AND Total_Venta = @total";
+            string queryAgregarDetalleVenta = "INSERT INTO Detalles_Venta (ID_Venta, ID_Producto, Cantidad, Precio) VALUES (@idVenta, @idProducto, @cantidad, @precio)";
+            string queryActualizarStockProducto = "UPDATE Productos SET Stock = Stock - @cantidad WHERE ID_Producto = @idProducto AND Stock >= @cantidad;";
+            string queryObtenerIDCliente = "SELECT ID_Cliente FROM Clientes WHERE Nombre = @nombrecliente";
+            string queryVenta = "INSERT INTO Ventas (Fecha_Venta, ID_Cliente, Total_Venta)" + "VALUES (@fecha, @idCliente, @total)";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
                 {
-                    // Obten el valor máximo de la columna "ID" (columna 0 en este caso)
-                    lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                    conn.Open();
+
+                    // Obtener ID del producto y su stock
+                    using (SqlCommand cmdObtenerIDProducto = new SqlCommand(queryObtenerIDProducto, conn))
+                    {
+                        cmdObtenerIDProducto.Parameters.AddWithValue("@nombreProducto", producto);
+                        SqlDataReader reader = cmdObtenerIDProducto.ExecuteReader();
+
+                        if (reader.Read())
+                        {
+                            idProducto = Convert.ToInt32(reader["ID_Producto"]);
+                            stockProducto = Convert.ToInt32(reader["Stock"]);
+                        }
+                        else
+                        {
+                            MessageBox.Show("El producto seleccionado no existe en la base de datos", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        reader.Close(); // Cerrar el DataReader
+                    }
+
+                    // Comprobar si hay suficiente stock
+                    if (stockProducto < cantidad)
+                    {
+                        MessageBox.Show("No hay suficiente stock para la venta.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Obtener ID de la venta
+                    using (SqlCommand cmdObtenerIDVenta = new SqlCommand(queryObtenerIDVenta, conn))
+                    {
+                        cmdObtenerIDVenta.Parameters.AddWithValue("@fecha", fecha);
+                        cmdObtenerIDVenta.Parameters.AddWithValue("@idCliente", idCliente);
+                        cmdObtenerIDVenta.Parameters.AddWithValue("@total", total);
+                        object resultVenta = cmdObtenerIDVenta.ExecuteScalar();
+
+                        if (resultVenta != null)
+                        {
+                            idVenta = Convert.ToInt32(resultVenta);
+                        }
+                        else
+                        {
+                            MessageBox.Show("La venta seleccionada no existe en la base de datos", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
+
+                    // Agregar detalle de venta
+                    using (SqlCommand cmdAgregarDetalleVenta = new SqlCommand(queryAgregarDetalleVenta, conn))
+                    {
+                        cmdAgregarDetalleVenta.Parameters.AddWithValue("@idVenta", idVenta);
+                        cmdAgregarDetalleVenta.Parameters.AddWithValue("@idProducto", idProducto);
+                        cmdAgregarDetalleVenta.Parameters.AddWithValue("@cantidad", cantidad);
+                        cmdAgregarDetalleVenta.Parameters.AddWithValue("@precio", precio);
+                        cmdAgregarDetalleVenta.ExecuteNonQuery();  // Ejecutar inserción en Detalles_Venta
+                    }
+
+                    // Actualizar el stock del producto
+                    using (SqlCommand cmdActualizarStock = new SqlCommand(queryActualizarStockProducto, conn))
+                    {
+                        cmdActualizarStock.Parameters.AddWithValue("@cantidad", cantidad);
+                        cmdActualizarStock.Parameters.AddWithValue("@idProducto", idProducto);
+                        cmdActualizarStock.ExecuteNonQuery();  // Ejecutar la actualización del stock
+                    }
+
+                    using (SqlCommand cmdObtenerIDCliente = new SqlCommand(queryObtenerIDCliente, conn))
+                    {
+                        cmdObtenerIDCliente.Parameters.AddWithValue("@nombrecliente", cliente);
+                        conn.Open();
+                        object result = cmdObtenerIDCliente.ExecuteScalar();
+
+                        if (result != null)
+                        {
+                            idCliente = Convert.ToInt32(result);
+                        }
+                        else
+                        {
+                            MessageBox.Show("El cliente seleccionado no existe en la base de datos", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
+
+                    using (SqlCommand cmd = new SqlCommand(queryVenta, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@fecha", fecha);
+                        cmd.Parameters.AddWithValue("@idCliente", idCliente);
+                        cmd.Parameters.AddWithValue("@total", total);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show("Venta Agregada y Stock Actualizado");
+
+                    if (dgvDetalle.Rows.Count > 0)
+                    {
+                        lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
                                             .Max(row => Convert.ToInt32(row.Cells[0].Value));
+                    }
+                    newID = lastID + 1;
+                    // Actualizar DataGridView
+                    dgvDetalle.Rows.Add(newID.ToString(), fecha, cliente, producto, cantidad, precio, total);
                 }
-                // Nuevo ID  es el último ID + 1
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al agregar venta: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    conn.Close();
+                }
+            }
+            limpiar();
+            dtpfecha.Focus();
+        }       
 
-                int newID = lastID + 1;
-                // Agregar el nuevo producto al DataGridViwe con el nuevo ID
+        void llenartotal()
+        {
+            double.TryParse(txtPrecio.Text, out precio);
+            double.TryParse(txtCantidad.Text, out cantidad);
+            double.TryParse(txtTotal.Text, out total);
+            if (!Regex.IsMatch(txtCantidad.Text, numeroPattern))
+            {
+                MessageBox.Show("La cantidad debe ser un número válido.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCantidad.Focus();
+                txtCantidad.Text = "";
+                return;
+            }
+            // Calcular el total
+            total = precio * cantidad;
+            txtTotal.Text = total.ToString();
+        }
 
-                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-                string queryObtenerID = "SELECT ID_Cliente FROM Clientes WHERE Nombre = @nombrecliente";
+        void llenarExistencia()
+        {
+            string query = "SELECT Stock FROM Productos WHERE Nombre_Producto = @nombreProducto";
 
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    // Obtener el producto seleccionado del Combobox
+                    producto = cbxProducto.Text;
+                    cmd.Parameters.AddWithValue("@nombreProducto", producto);
+
+                    conn.Open();
+                    object result = cmd.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        lblExistencia.Text = $"En existencia: {result.ToString()}";
+                    }
+                    else
+                    {
+                        lblExistencia.Text = $"En existencia: {result.ToString()}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al obtener existencia: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        void llenarPrecio()
+        {
+            string precio = @"SELECT Precio FROM Productos WHERE Nombre_Producto = @nombreProducto";
+            try
+            {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    try
+                    using (SqlCommand cmd = new SqlCommand(precio, conn))
                     {
-                        // Obtener el ID_Cliente
-                        using (SqlCommand cmdObtenerID = new SqlCommand(queryObtenerID, conn))
-                        {
-                            cmdObtenerID.Parameters.AddWithValue("@nombrecliente", cliente);
-                            conn.Open();
-                            object result = cmdObtenerID.ExecuteScalar(); // Ejecutar y obtener el resultado
+                        producto = cbxProducto.Text;
+                        cmd.Parameters.AddWithValue("@nombreProducto", producto);
+                        conn.Open();
+                        object result = cmd.ExecuteScalar();
 
-                            if (result != null)
-                            {
-                                idCliente = Convert.ToInt32(result);
-                            }
-                            else
-                            {
-                                MessageBox.Show("El cliente seleccionado no existe en la base de datos");
-                                return;
-                            }
-                        }
-                        string query = "INSERT INTO Ventas (Fecha_Venta, ID_Cliente, Total_Venta)" +
-                            "VALUES (@fecha, @idCliente, @total)";
-                        using (SqlCommand cmd = new SqlCommand(query, conn))
+                        if (result != null)
                         {
-                            cmd.Parameters.AddWithValue("@fecha", fecha);
-                            cmd.Parameters.AddWithValue("@idCliente", idCliente);
-                            cmd.Parameters.AddWithValue("@total", total);
-                            cmd.ExecuteNonQuery();
+                            txtPrecio.Clear();
+                            txtPrecio.Text = result.ToString();
                         }
-                        conn.Close();
-                        MessageBox.Show("Venta agregada");
-                        dgvDetalle.Rows.Add(newID.ToString(), fecha, cliente, total);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error al agregar venta {ex.Message}");
-                    }
-                    finally
-                    {
-                        conn.Close();
+                        else
+                        {
+                            MessageBox.Show("El Producto seleccionado no existe en la base de datos", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            txtPrecio.Clear();
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al obtener el Precio {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
+        void llenarComboBoxProductosPrecio()
+        {
+            string productos = "SELECT Nombre_Producto FROM Productos";
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand(productos, conn))
+                    {
+                        conn.Open();
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        cbxProducto.Items.Clear();
+
+                        while (reader.Read())
+                        {
+                            cbxProducto.Items.Add(reader["Nombre_Producto"].ToString());
+                        }
+                        if (cbxProducto.Items.Count > 0)
+                        {
+                            cbxProducto.SelectedIndex = 0;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al llenar el ComboBox: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         void llenarComboBoxCliente()
         {
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-            string query = "SELECT Nombre FROM Clientes";
+            string cliente = "SELECT Nombre FROM Clientes";
             try
-            {
+            {   
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(cliente, conn))
                     {
                         conn.Open();
                         SqlDataReader reader = cmd.ExecuteReader();
@@ -236,81 +565,77 @@ namespace Sistema_de_Ventas
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al llenar ComboBox: {ex.Message}");
+                MessageBox.Show($"Error al llenar ComboBox: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         void llenarDataGridView()
         {
-            // Cadena de conexion
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-
-            // Consulta SQL
+            // Consulta SQL corregida
             string query = @"
-            SELECT 
-                v.ID_Venta,
-                v.Fecha_Venta,
-                c.Nombre,
-                v.Total_Venta
-            FROM Ventas v
-            INNER JOIN Clientes c
-            ON v.ID_Cliente = c.ID_Cliente";
+        SELECT 
+            v.ID_Venta AS Codigo,
+            v.Fecha_Venta AS Fecha,
+            c.Nombre AS Cliente,
+            p.Nombre_Producto AS Producto,
+            d.Cantidad AS Cantidad,
+            p.Precio AS Precio,
+            (p.Precio * d.Cantidad) AS Total
+        FROM Ventas v
+        INNER JOIN Clientes c ON v.ID_Cliente = c.ID_Cliente
+        INNER JOIN Detalles_Venta d ON v.ID_Venta = d.ID_Venta
+        INNER JOIN Productos p ON d.ID_Producto = p.ID_Producto";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                try
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
                     SqlCommand cmd = new SqlCommand(query, conn);
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        int lastID = 0;
-                        if (dgvDetalle.Rows.Count > 0)
-                        {
-                            lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
-                                                    .Max(row => Convert.ToInt32(row.Cells["colCodigo"].Value));
-                        }
+                        dgvDetalle.Rows.Clear();
+
                         while (reader.Read())
                         {
-                            lastID++;
-                            // Crear una nueva fila y asignar los valores manualmente
-                            int rowIndex = dgvDetalle.Rows.Add();
-                            dgvDetalle.Rows[rowIndex].Cells["colCodigo"].Value = reader["ID_Venta"];
-                            dgvDetalle.Rows[rowIndex].Cells["colFecha"].Value = reader["Fecha_Venta"];
-                            dgvDetalle.Rows[rowIndex].Cells["colCliente"].Value = reader["Nombre"];
-                            dgvDetalle.Rows[rowIndex].Cells["colTotal"].Value = reader["Total_Venta"];
+                            dgvDetalle.Rows.Add(
+                                reader["Codigo"],       // Columna: Código
+                                reader["Fecha"],        // Columna: Fecha
+                                reader["Cliente"],      // Columna: Cliente
+                                reader["Producto"],     // Columna: Producto
+                                reader["Cantidad"],     // Columna: Cantidad
+                                reader["Precio"],       // Columna: Precio
+                                reader["Total"]
+                                );
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}");
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         void limpiar()
         {
             btnAgregar.Enabled = true;
-            btnEliminar.Enabled = false;
             btnModificar.Enabled = false;
+            btnEliminar.Enabled = false;
             dtpfecha.Text = "";
             cbxCliente.Text = "";
-            txtTotal.Text = "";
             cbxCliente.Items.Clear();
+            cbxProducto.Text = "";
+            cbxProducto.Items.Clear();
+            txtPrecio.Text = "";
+            txtCantidad.Text = "";
+            txtTotal.Text = "";
+            lblExistencia.Text = "";
         }
 
         private void dgvDetalle_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            posicion = dgvDetalle.CurrentRow.Index;
-            dtpfecha.Text = dgvDetalle[1, posicion].Value.ToString();
-            cbxCliente.Text = dgvDetalle[2, posicion].Value.ToString();
-            txtTotal.Text = dgvDetalle[3, posicion].Value.ToString();
-            btnAgregar.Enabled = false;
-            btnModificar.Enabled = true;
-            btnEliminar.Enabled = true;
-            dtpfecha.Focus();
         }
 
         private void pictureBox7_Click(object sender, EventArgs e)
@@ -330,15 +655,13 @@ namespace Sistema_de_Ventas
         private void pictureBox5_Click(object sender, EventArgs e)
         {
             this.Hide();
-            FormDetalles detalles = new FormDetalles();
+            frmEstadisticas detalles = new frmEstadisticas();
             detalles.Show();
         }
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
-            agregarbase();
-            limpiar();
-            dtpfecha.Focus();
+            agregarbase();            
         }
 
         private void btnModificar_Click(object sender, EventArgs e)
@@ -348,7 +671,7 @@ namespace Sistema_de_Ventas
             {
                 fecha = dtpfecha.Text;
                 cliente = cbxCliente.Text;
-                total = txtTotal.Text;
+                total = Convert.ToDouble(txtTotal.Text);
                 modificarbase();
                 limpiar();
                 dtpfecha.Focus();
@@ -408,17 +731,37 @@ namespace Sistema_de_Ventas
             }
         }
 
+        private void cbxProducto_Click(object sender, EventArgs e)
+        {
+            llenarComboBoxProductosPrecio();
+        }
+
+        private void btnModificar_Click_1(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("¿Estás seguro que deseas modificar este proveedor", "Confirmacion", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                modificarbase();                
+            }
+        }
+
+        private void cbxProducto_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            llenarPrecio();
+            llenarExistencia();
+        }
+
+        private void txtCantidad_TextChanged(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(txtCantidad.Text)) // Verificar si el campo no está vacío
+            {
+                llenartotal();
+            }
+        }
+
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            posicion = dgvDetalle.CurrentRow.Index;
-            dtpfecha.Text = dgvDetalle[1, posicion].Value.ToString();
-            cbxCliente.Text = dgvDetalle[2, posicion].Value.ToString();
-            txtTotal.Text = dgvDetalle[3, posicion].Value.ToString();
-            btnAgregar.Enabled = false;
-            btnModificar.Enabled = true;
-            btnEliminar.Enabled = true;
-            dtpfecha.Focus();
-            llenarComboBoxCliente();
+
         }
 
         private void pictureBox6_Click(object sender, EventArgs e)
@@ -437,10 +780,13 @@ namespace Sistema_de_Ventas
 
         private void dgvDetalle_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            dgvDetalle.Columns[2].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvDetalle.Columns[6].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvDetalle.Columns[5].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvDetalle.Columns[4].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dgvDetalle.Columns[3].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvDetalle.Columns[2].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dgvDetalle.Columns[1].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            if (e.ColumnIndex == 3 && e.Value !=null)
+            if (e.ColumnIndex == 5 && e.Value !=null || e.ColumnIndex == 6 && e.Value !=null)
             {
                 // Formatear la celda para mostrar el signo del colar
                 e.Value = "$" + e.Value.ToString();
@@ -493,7 +839,11 @@ namespace Sistema_de_Ventas
                     dtpfecha.Text = dgvDetalle[1, posicion].Value.ToString();
                     llenarComboBoxCliente();
                     cbxCliente.Text = dgvDetalle[2, posicion].Value.ToString();
-                    txtTotal.Text = dgvDetalle[3, posicion].Value.ToString();
+                    llenarComboBoxProductosPrecio();
+                    cbxProducto.Text = dgvDetalle[3, posicion].Value.ToString();
+                    txtCantidad.Text = dgvDetalle[4, posicion].Value.ToString();
+                    txtPrecio.Text = dgvDetalle[5, posicion].Value.ToString();
+                    txtTotal.Text = dgvDetalle[6, posicion].Value.ToString();
                     btnAgregar.Enabled = false;
                     btnModificar.Enabled = true;
                     btnEliminar.Enabled = true;
@@ -501,7 +851,7 @@ namespace Sistema_de_Ventas
                 }
                 else
                 {
-                    MessageBox.Show("La fila seleccionada contiene celdas vacías.");
+                    MessageBox.Show("La fila seleccionada contiene celdas vacías.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
 
             }   

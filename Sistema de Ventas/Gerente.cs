@@ -13,7 +13,9 @@ namespace Sistema_de_Ventas
     {
         public Gerente()
         {
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             InitializeComponent();
+
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -28,6 +30,25 @@ namespace Sistema_de_Ventas
             this.Hide();
             FormPrincipal principal = new FormPrincipal();
             principal.Show();
+        }
+
+        private void Gerente_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnCambiarContraseña_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Cambiar_Contraseñas cambiarcontra = new Cambiar_Contraseñas();
+            cambiarcontra.Show();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            FormAdministrarUsuarios administrar = new FormAdministrarUsuarios();
+            administrar.Show();
         }
     }
 }

@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Data.SqlClient;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using System.Drawing.Imaging;
 
 namespace Sistema_de_Ventas
 {
@@ -14,22 +16,89 @@ namespace Sistema_de_Ventas
     public partial class FormProveedores : Form
     {
         
-        int posicion;
-        string nombre, contacto, telefono, email;
+        int posicion, id;
+        string nombre, contacto, email, telefono, telefonopattern = @"^-?\d*\.?\d+$", emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$", connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
         public FormProveedores()
         {
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            
             InitializeComponent();
             llenarDataGridView();
             cbxNombre.Focus();
-            llenarcombobox();
+            iniciosesion();
+            limpiar();
+            // Ajustar automáticamente el tamaño de las columnas para que se ajusten al contenido
+            dgvDetalle.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+
+            // Ajustar automáticamente el tamaño de la última columna rellenando el espacio restante
+            dgvDetalle.Columns[dgvDetalle.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
         }
 
-         void eliminarbase()
+        void iniciosesion()
+        {
+            if (Form1.cargo == "Adminsitrador")
+            {
+                pctbxVentas.Enabled = false;
+                pctbxVentas.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxVentas.png"));
+                pctbxDetalleVenta.Enabled = false;
+                pctbxDetalleVenta.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxDetalleVenta.png"));
+                pctbxCompras.Enabled = false;
+                pctbxCompras.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxCompras.png"));
+            }
+            else if (Form1.cargo == "Cajero")
+            {
+                pctbxClientes.Enabled = false;
+                pctbxClientes.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxClientes.png"));
+                pctbxDetalleVenta.Enabled = false;
+                pctbxDetalleVenta.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxDetalleVenta.png"));
+                pctbxCompras.Enabled = false;
+                pctbxCompras.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxCompras.png"));                
+                pctbxProductos.Enabled = false;
+                pctbxProductos.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxProductos.png"));
+            }
+        }
+
+        private Image ConvertToGrayscale(Image originalImage)
+        {
+            // Crear un nuevo Bitmap con las mismas dimensiones que la imagen original
+            Bitmap grayscaleImage = new Bitmap(originalImage.Width, originalImage.Height);
+
+            // Crear gráficos desde el Bitmap
+            using (Graphics g = Graphics.FromImage(grayscaleImage))
+            {
+                // Crear un conjunto de atributos de imagen
+                ImageAttributes attributes = new ImageAttributes();
+
+                // Crear una matriz de escala de grises
+                float[][] colorMatrixElements = {
+            new float[] { 0.3f, 0.3f, 0.3f, 0, 0 },
+            new float[] { 0.59f, 0.59f, 0.59f, 0, 0 },
+            new float[] { 0.11f, 0.11f, 0.11f, 0, 0 },
+            new float[] { 0, 0, 0, 1, 0 },
+            new float[] { 0, 0, 0, 0, 1 }
+        };
+
+                // Crear la matriz de color
+                ColorMatrix colorMatrix = new ColorMatrix(colorMatrixElements);
+
+                // Establecer la matriz de color en los atributos
+                attributes.SetColorMatrix(colorMatrix);
+
+                // Dibujar la imagen original en escala de grises
+                g.DrawImage(originalImage,
+                    new Rectangle(0, 0, originalImage.Width, originalImage.Height),
+                    0, 0, originalImage.Width, originalImage.Height,
+                    GraphicsUnit.Pixel, attributes);
+            }
+
+            return grayscaleImage;
+        }
+
+        void eliminarbase()
         {
             posicion = dgvDetalle.CurrentRow.Index;
             var id = dgvDetalle[0, posicion].Value.ToString();
-            // Conexion
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
+
             string query = @"DELETE FROM Proveedores WHERE ID_Proveedor = @idProveedor";
 
             // 1. Conexion y comando
@@ -50,22 +119,45 @@ namespace Sistema_de_Ventas
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Error al eliminar Proveedor: {ex.Message}");
+                        MessageBox.Show($"Error al eliminar Proveedor: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
         }
 
-        void modificarbase()
+        private void modificarbase()
         {
             posicion = dgvDetalle.CurrentRow.Index;
-            var id = dgvDetalle[0, posicion].Value.ToString();
-            var nombre = dgvDetalle[1, posicion].Value.ToString();
-            var contacto = dgvDetalle[2, posicion].Value.ToString();
-            var telefono = dgvDetalle[3, posicion].Value.ToString();
-            var email = dgvDetalle[4, posicion].Value.ToString();
+            id = Convert.ToInt32(dgvDetalle[0, posicion].Value.ToString());
+            nombre = cbxNombre.Text;
+            contacto = txtContacto.Text;
+            telefono = txtTelefono.Text;
+            email = txtEmail.Text;
+
+            // Rstriccion campos vacíos
+            if (nombre == "" || contacto == "" || string.IsNullOrWhiteSpace(txtTelefono.Text) || email == "")
+            {
+                MessageBox.Show("No debe haber campos vacios", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            // Restricción de número
+            if (!Regex.IsMatch(txtTelefono.Text, telefonopattern))
+            {
+                MessageBox.Show("El teléfono debe ser un número válido.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTelefono.Focus();
+                txtTelefono.Text = "";
+                return;
+            }
+            // Restricción de email
+            if (!Regex.IsMatch(email, emailPattern))
+            {
+                MessageBox.Show("Por favor ingresa un correo electrónico valido", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEmail.Text = "";
+                txtEmail.Focus();
+                return;
+            }            
+
             // Conexion
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
             string query = @"
         UPDATE Proveedores
         SET Nombre_Proveedor = @nombre,
@@ -97,65 +189,81 @@ namespace Sistema_de_Ventas
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al actualizar Proveedor: {ex.Message}");
+                    MessageBox.Show($"Error al actualizar Proveedor: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+            limpiar();
+            cbxNombre.Focus();
         }
 
         void agregarbase()
         {
             nombre = cbxNombre.Text;
             contacto = txtContacto.Text;
+            // Restricción campos vacios
+            if (nombre == "" || contacto == "" || string.IsNullOrWhiteSpace(txtTelefono.Text) || email == "")
+            {
+                MessageBox.Show("No debe haber campos vacios", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            // Restricción números validos
             telefono = txtTelefono.Text;
+            if (!Regex.IsMatch(txtTelefono.Text, telefonopattern))
+            {
+                MessageBox.Show("El teléfono debe de ser en número en entero.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTelefono.Focus();
+                txtTelefono.Text = "";
+                return;
+            }
+            // Restricción email valido
             email = txtEmail.Text;
-            if (nombre == "" || telefono == "" || email == "")
+            if (!Regex.IsMatch(email, emailPattern))
             {
-                MessageBox.Show("No hay datos");
-            }
-            else
+                MessageBox.Show("Por favor ingresa un correo electrónico valido", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEmail.Text = "";
+                txtEmail.Focus();
+                return;
+            }            
+            // Obtener el último valor de ID en el DataGridView
+            int lastID = 0;
+            if (dgvDetalle.Rows.Count > 0)
             {
-                // Obtener el último valor de ID en el DataGridView
-                int lastID = 0;
-                if (dgvDetalle.Rows.Count > 0)
-                {
-                    // Obten el valor máximo de la columna "ID" (columna 0 en este caso)
-                    lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
-                                            .Max(row => Convert.ToInt32(row.Cells[0].Value));
-                }
-                // Nuevo ID  es el último ID + 1
-                int newID = lastID + 1;
-                // Agregar el nuevo producto al DataGridView con el nuevo ID
-
-                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-                string query = "INSERT INTO Proveedores (Nombre_Proveedor, Contacto, Telefono, Email)" +
-                    "VALUES (@nombre, @contacto, @telefono, @email)";
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@nombre", nombre);
-                    cmd.Parameters.AddWithValue("@contacto", contacto);
-                    cmd.Parameters.AddWithValue("@telefono", telefono);
-                    cmd.Parameters.AddWithValue("@email", email);
-
-                    try
-                    {
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Proveedor agregado.");
-                        dgvDetalle.Rows.Add(newID.ToString(), nombre, contacto, telefono, email);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error al agregar proveedor {ex.Message}");
-                    }
-                }
-
+                // Obten el valor máximo de la columna "ID" (columna 0 en este caso)
+                lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                        .Max(row => Convert.ToInt32(row.Cells[0].Value));
             }
+            // Nuevo ID  es el último ID + 1
+            int newID = lastID + 1;
+            // Agregar el nuevo producto al DataGridView con el nuevo ID
+
+            string query = "INSERT INTO Proveedores (Nombre_Proveedor, Contacto, Telefono, Email)" +
+                "VALUES (@nombre, @contacto, @telefono, @email)";
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@nombre", nombre);
+                cmd.Parameters.AddWithValue("@contacto", contacto);
+                cmd.Parameters.AddWithValue("@telefono", telefonopattern);
+                cmd.Parameters.AddWithValue("@email", email);
+
+                try
+                {
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Proveedor agregado.");
+                    dgvDetalle.Rows.Add(newID.ToString(), nombre, contacto, telefono, email);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al agregar proveedor {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            limpiar();
+            cbxNombre.Focus();
         }
 
         void llenarcombobox()
         {
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
             string query = "SELECT Nombre_Proveedor FROM Proveedores";
 
             try
@@ -186,15 +294,12 @@ namespace Sistema_de_Ventas
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al llenar el ComboBox: {ex.Message}");
+                MessageBox.Show($"Error al llenar el ComboBox: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void llenarDataGridView()
         {
-            // Cadena de conexion
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-
             // Consulta SQL
             string query = "Select ID_Proveedor, Nombre_Proveedor, Contacto, Telefono, Email FROM Proveedores";
 
@@ -228,7 +333,7 @@ namespace Sistema_de_Ventas
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}");
+                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -283,7 +388,7 @@ namespace Sistema_de_Ventas
         private void pictureBox5_Click(object sender, EventArgs e)
         {
             this.Hide();
-            FormDetalles detalles = new FormDetalles();
+            frmEstadisticas detalles = new frmEstadisticas();
             detalles.Show();
         }
 
@@ -363,7 +468,7 @@ namespace Sistema_de_Ventas
                 }
                 else
                 {
-                    MessageBox.Show("La fila seleccionada contiene celdas vacías.");
+                    MessageBox.Show("La fila seleccionada contiene celdas vacías.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
 
             }
@@ -426,6 +531,11 @@ namespace Sistema_de_Ventas
 
         }
 
+        private void cbxNombre_Click(object sender, EventArgs e)
+        {
+            llenarcombobox();
+        }
+
         private void label3_Click(object sender, EventArgs e)
         {
 
@@ -443,9 +553,7 @@ namespace Sistema_de_Ventas
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
-            agregarbase();
-            limpiar();
-            cbxNombre.Focus();
+            agregarbase();           
         }        
 
         private void btnEliminar_Click(object sender, EventArgs e)
@@ -471,9 +579,7 @@ namespace Sistema_de_Ventas
             DialogResult result = MessageBox.Show("¿Estás seguro que deseas modificar este proveedor", "Confirmacion", MessageBoxButtons.YesNo);
             if (result == DialogResult.Yes)
             {
-                modificarbase();
-                limpiar();
-                cbxNombre.Focus();
+                modificarbase();                
             }            
         }
     }

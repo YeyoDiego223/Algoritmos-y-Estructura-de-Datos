@@ -7,18 +7,88 @@ using System.Linq;
 using System.Text;
 using System.Data.SqlClient;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
+using System.Text.RegularExpressions;
 
 namespace Sistema_de_Ventas
 {
     public partial class FormClientes : Form
     {
-        int posicion;
-        string nombre, apellido, email, tel, direcc;
+        int posicion, id;
+        string nombre, apellido, email, tel, direcc, telefonopattern = @"^-?\d*\.?\d+$", emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$", connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
         public FormClientes()
         {
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             InitializeComponent();
             llenarDataGridView();
             txtNombre.Focus();
+            iniciosesion();
+            // Ajustar automáticamente el tamaño de las columnas para que se ajusten al contenido
+            dgvDetalle.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+
+            // Ajustar automáticamente el tamaño de la última columna rellenando el espacio restante
+            dgvDetalle.Columns[dgvDetalle.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        }
+
+        private Image ConvertToGrayscale(Image originalImage)
+        {
+            // Crear un nuevo Bitmap con las mismas dimensiones que la imagen original
+            Bitmap grayscaleImage = new Bitmap(originalImage.Width, originalImage.Height);
+
+            // Crear gráficos desde el Bitmap
+            using (Graphics g = Graphics.FromImage(grayscaleImage))
+            {
+                // Crear un conjunto de atributos de imagen
+                ImageAttributes attributes = new ImageAttributes();
+
+                // Crear una matriz de escala de grises
+                float[][] colorMatrixElements = {
+            new float[] { 0.3f, 0.3f, 0.3f, 0, 0 },
+            new float[] { 0.59f, 0.59f, 0.59f, 0, 0 },
+            new float[] { 0.11f, 0.11f, 0.11f, 0, 0 },
+            new float[] { 0, 0, 0, 1, 0 },
+            new float[] { 0, 0, 0, 0, 1 }
+        };
+
+                // Crear la matriz de color
+                ColorMatrix colorMatrix = new ColorMatrix(colorMatrixElements);
+
+                // Establecer la matriz de color en los atributos
+                attributes.SetColorMatrix(colorMatrix);
+
+                // Dibujar la imagen original en escala de grises
+                g.DrawImage(originalImage,
+                    new Rectangle(0, 0, originalImage.Width, originalImage.Height),
+                    0, 0, originalImage.Width, originalImage.Height,
+                    GraphicsUnit.Pixel, attributes);
+            }
+
+            return grayscaleImage;
+        }
+
+        void iniciosesion()
+        {
+            if (Form1.cargo == "Administrador")
+            {
+                pctbxVentas.Enabled = false;
+                pctbxVentas.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxVentas.png"));
+                pctbxDetalleVenta.Enabled = false;
+                pctbxDetalleVenta.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxDetalleVenta.png"));
+                pctbxCompras.Enabled = false;
+                pctbxCompras.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxCompras.png"));
+            }
+            else if (Form1.cargo == "Cajero")
+            {
+               
+                pctbxDetalleVenta.Enabled = false;
+                pctbxDetalleVenta.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxDetalleVenta.png"));
+                pctbxCompras.Enabled = false;
+                pctbxCompras.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxCompras.png"));
+                pctbxProveedores.Enabled = false;
+                pctbxProveedores.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxProveedores.png"));
+                pctbxProductos.Enabled = false;
+                pctbxProductos.Image = ConvertToGrayscale(Image.FromFile("C:\\Users\\flore\\OneDrive\\Documentos\\Sistema de ventas\\pcbxxProductos.png"));
+            }
         }
 
         void eliminarbase()
@@ -26,7 +96,6 @@ namespace Sistema_de_Ventas
             posicion = dgvDetalle.CurrentRow.Index;
             var id = dgvDetalle[0, posicion].Value.ToString();
             // Conexion
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
             string query = @"DELETE FROM Clientes WHERE ID_Cliente = @idCliente";
 
             // 1. Conexion y comando
@@ -59,14 +128,36 @@ namespace Sistema_de_Ventas
         void modificarbase()
         {
             posicion = dgvDetalle.CurrentRow.Index;
-            var id = dgvDetalle[0, posicion].Value.ToString();
-            var nombre = dgvDetalle[1, posicion].Value.ToString();
-            var apellido = dgvDetalle[2, posicion].Value.ToString();
-            var email = dgvDetalle[3, posicion].Value.ToString();
-            var tel = dgvDetalle[4, posicion].Value.ToString();
-            var direcc = dgvDetalle[5, posicion].Value.ToString();
+            id = Convert.ToInt32(dgvDetalle[0, posicion].Value.ToString());
+            nombre = txtNombre.Text;
+            apellido = txtApellido.Text;
+            direcc = txtDireccion.Text;
+            email = txtEmail.Text;
+            tel = txtTelefono.Text;
+
+            // Rstriccion campos vacíos
+            if (nombre == "" || apellido == "" || direcc == "" || email == "" || string.IsNullOrWhiteSpace(txtTelefono.Text))
+            {
+                MessageBox.Show("No debe haber campos vacios", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            // Restricción de email
+            if (!Regex.IsMatch(email, emailPattern))
+            {
+                MessageBox.Show("Por favor ingresa un correo electrónico valido", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEmail.Text = "";
+                txtEmail.Focus();
+                return;
+            }
+            // Restricción de número
+            if (!Regex.IsMatch(txtTelefono.Text, telefonopattern))
+            {
+                MessageBox.Show("El teléfono debe ser un número válido.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTelefono.Focus();
+                txtTelefono.Text = "";
+                return;
+            }
             // Conexión
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
             string query = @"
         UPDATE Clientes 
         SET Nombre = @nombre, 
@@ -104,6 +195,8 @@ namespace Sistema_de_Ventas
                     MessageBox.Show($"Error al actualizar Cliente: {ex.Message}");
                 }
             }
+            limpiar();
+            txtNombre.Focus();
         }
 
         void agregarbase()
@@ -115,50 +208,62 @@ namespace Sistema_de_Ventas
             direcc = txtDireccion.Text;
             if (nombre == "" || apellido == "" || email == "" || tel == "" || direcc == "")
             {
-                MessageBox.Show("No hay datos");
+                MessageBox.Show("No debe haber campos vacíos");
+                return;
             }
-            else
+            // Restricción de email
+            if (!Regex.IsMatch(email, emailPattern))
             {
-                int lastID = 0;
-                if (dgvDetalle.Rows.Count > 0)
-                {
-                    lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
-                                        .Max(row => Convert.ToInt32(row.Cells[0].Value));
-                }
-                int newID = lastID + 1;
-                string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-                string query = "INSERT INTO Clientes (Nombre, Apellido, Email, Telefono, Direccion) " +
-                       "VALUES (@nombre, @apellido, @email, @telefono, @direccion)";
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@nombre", nombre);
-                    cmd.Parameters.AddWithValue("@apellido", apellido);
-                    cmd.Parameters.AddWithValue("@email", email);
-                    cmd.Parameters.AddWithValue("@telefono", tel);
-                    cmd.Parameters.AddWithValue("@direccion", direcc);
+                MessageBox.Show("Por favor ingresa un correo electrónico valido", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEmail.Text = "";
+                txtEmail.Focus();
+                return;
+            }
+            // Restricción de número
+            if (!Regex.IsMatch(txtTelefono.Text, telefonopattern))
+            {
+                MessageBox.Show("El teléfono debe ser un número válido.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTelefono.Focus();
+                txtTelefono.Text = "";
+                return;
+            }
+            int lastID = 0;
+            if (dgvDetalle.Rows.Count > 0)
+            {
+                lastID = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                                    .Max(row => Convert.ToInt32(row.Cells[0].Value));
+            }
+            int newID = lastID + 1;
+            string query = "INSERT INTO Clientes (Nombre, Apellido, Email, Telefono, Direccion) " +
+                   "VALUES (@nombre, @apellido, @email, @telefono, @direccion)";
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@nombre", nombre);
+                cmd.Parameters.AddWithValue("@apellido", apellido);
+                cmd.Parameters.AddWithValue("@email", email);
+                cmd.Parameters.AddWithValue("@telefono", tel);
+                cmd.Parameters.AddWithValue("@direccion", direcc);
 
-                    try
-                    {
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Clientes agregado.");
-                        dgvDetalle.Rows.Add(newID.ToString(), nombre, apellido, email, tel, direcc);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error al agregar cliente {ex.Message}");
-                    }
+                try
+                {
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Clientes agregado.");
+                    dgvDetalle.Rows.Add(newID.ToString(), nombre, apellido, email, tel, direcc);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al agregar cliente {ex.Message}");
                 }
 
             }
+            limpiar();
+            txtNombre.Focus();
         }
 
         private void llenarDataGridView()
         {
-            // Cadena de conexion
-            string connectionString = "Server=MSI\\SQLEXPRESS;Database=BDTIENDA;Trusted_Connection=True;";
-
             // Consulta SQL
             string query = "Select ID_Cliente, Nombre, Apellido, Email, Telefono, Direccion FROM Clientes";
 
@@ -193,7 +298,7 @@ namespace Sistema_de_Ventas
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}");
+                    MessageBox.Show($"Error al llenar el DataGridView: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -213,7 +318,7 @@ namespace Sistema_de_Ventas
         private void pictureBox5_Click(object sender, EventArgs e)
         {
             this.Hide();
-            FormDetalles detalles = new FormDetalles();
+            frmEstadisticas detalles = new frmEstadisticas();
             detalles.Show();
         }
 
@@ -262,9 +367,7 @@ namespace Sistema_de_Ventas
 
         private void button1_Click(object sender, EventArgs e)
         {
-            agregarbase();
-            limpiar();
-            txtNombre.Focus();
+            agregarbase();            
         }
 
         private void btnEliminar_Click(object sender, EventArgs e)
@@ -285,9 +388,7 @@ namespace Sistema_de_Ventas
             DialogResult result = MessageBox.Show("¿Estas seguro de modificar este cliente?", "Confirmación", MessageBoxButtons.YesNo);
             if (result == DialogResult.Yes)
             {
-                modificarbase();
-                limpiar();
-                txtNombre.Focus();
+                modificarbase();                
             }            
         }
 
@@ -373,7 +474,7 @@ namespace Sistema_de_Ventas
                 }
                 else
                 {
-                    MessageBox.Show("La fila seleccionada contiene celdas vacías.");
+                    MessageBox.Show("La fila seleccionada contiene celdas vacías.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 
             }
