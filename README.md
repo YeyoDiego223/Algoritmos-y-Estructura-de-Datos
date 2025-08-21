@@ -1,27 +1,51 @@
-# Sistema de Punto de Venta (Proyecto Académico)
+# Sistema de Punto de Venta en C#/.NET (Windows Forms)
 
-Este proyecto es un sistema de consola para la gestión de un punto de venta, desarrollado como parte del curso de Algoritmos y Estructura de Datos.
+Una aplicación de escritorio completa para la gestión de un punto de venta, desarrollada con C# y el framework de Windows Forms. El sistema permite administrar inventario, usuarios, clientes, proveedores, compras y ventas, almacenando toda la información en una base de datos local SQLite.
 
-## Características Principales
-* Gestión de inventario (alta, baja, modificación de productos).
-* Procesamiento de ventas y generación de tickets.
-* Consulta de productos.
-* Reporte simple de ventas.
+## 📜 Características Principales
+* **Gestión de Usuarios:** Creación, edición y eliminación de usuarios con diferentes roles (Gerente, Administrador, Cajero).
+* **Módulo de Clientes y Proveedores:** Administración completa (CRUD) de clientes y proveedores.
+* **Control de Inventario:** Gestión de productos, incluyendo stock, precios y categorías.
+* **Procesamiento de Transacciones:** Registro detallado de ventas y compras.
+* **Estadísticas:** Módulo de visualización de estadísticas de ventas.
 
-## Tecnologías y Conceptos Aplicados
-* **Lenguaje:** Python (*o el que hayas usado*)
-* **Paradigmas:** Programación Orientada a Objetos (POO)
-* **Estructuras de Datos:** Uso de listas y diccionarios para la gestión de datos en memoria.
-* **Diseño de Software:** Lógica de negocio para el manejo de transacciones e inventario.
+## 🛠️ Tecnologías Utilizadas
+* **Lenguaje:** C#
+* **Framework:** .NET / Windows Forms
+* **Base de Datos:** SQLite
+* **Acceso a Datos:** Microsoft.Data.Sqlite
 
-## Cómo Ejecutarlo
-1.  Clonar el repositorio.
-2.  Navegar a la carpeta `Sistema de Ventas PAI`.
-3.  Ejecutar el archivo principal desde la terminal:
+## 🚀 Cómo Ejecutar el Proyecto
+
+### Prerrequisitos
+* **Visual Studio 2019** o superior.
+* Tener instalada la carga de trabajo **".NET desktop development"** en Visual Studio.
+
+### Pasos de Instalación y Ejecución
+
+1.  **Clonar el repositorio:**
     ```bash
-    python main.py 
+    git clone [https://github.com/tu-usuario/tu-repositorio.git](https://github.com/tu-usuario/tu-repositorio.git)
     ```
-    *(o el comando que corresponda)*
+
+2.  **Abrir en Visual Studio:**
+    * Abre el archivo de la solución (`.sln`) con Visual Studio.
+
+3.  **Configurar el Script de la Base de Datos (Paso Crucial):**
+    * En el "Explorador de Soluciones" de Visual Studio, busca tu archivo `schema.sql`.
+    * Haz clic derecho sobre él y ve a **Propiedades (Properties)**.
+    * Asegúrate de que la opción **"Copiar en el directorio de salida" (Copy to Output Directory)** esté establecida en **"Copiar si es más reciente" (Copy if newer)**.
+    * *Este paso es fundamental para que la aplicación pueda encontrar el archivo y crear la base de datos la primera vez que se ejecuta.*
+    
+
+4.  **Restaurar Paquetes y Construir:**
+    * El proyecto debería restaurar los paquetes de NuGet automáticamente. Si no, haz clic derecho en la solución en el "Explorador de Soluciones" y selecciona **"Restaurar paquetes NuGet" (Restore NuGet Packages)**.
+    * Construye la solución desde el menú **"Compilar" (Build) -> "Compilar solución" (Build Solution)**.
+
+5.  **Ejecutar la Aplicación:**
+    * Presiona el botón **"Iniciar" (Start)** (el que tiene el ícono de Play ▶️) o presiona la tecla `F5`.
+    * La aplicación se iniciará y creará el archivo de base de datos `BDTIENDA.db` en su primera ejecución. El usuario por defecto es `Gerente` con la contraseña `Gerente`.
+
 
 ## Captura de Pantalla
 <img width="864" height="744" alt="image" src="https://github.com/user-attachments/assets/0ed604c4-22e2-4d9e-9701-29532db51300" />
