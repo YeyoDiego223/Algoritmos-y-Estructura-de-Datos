@@ -25,7 +25,7 @@ Una aplicación de escritorio completa para la gestión de un punto de venta, de
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone [https://github.com/tu-usuario/tu-repositorio.git](https://github.com/tu-usuario/tu-repositorio.git)
+    git clone https://github.com/YeyoDiego223/Algoritmos-y-Estructura-de-Datos
     ```
 
 2.  **Abrir en Visual Studio:**
